@@ -1,0 +1,18 @@
+:root{
+  /*palette*/
+  --white: #fff;
+  --grey: #E5E5E5;
+  --light-grey: #84909F;
+  --dark-grey: #575757;
+  --blue: #0556BF;
+  --light-blue: #065FD4;
+
+
+  /*theme*/
+  --def: var(--white);
+  --back: var(--grey);
+  --main-text: var(--dark-grey);
+  --text: var(--light-grey);
+  --button: var(--blue);
+  --hover-button: var(--light-blue);
+}
