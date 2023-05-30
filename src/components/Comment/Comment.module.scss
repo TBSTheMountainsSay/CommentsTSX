@@ -10,7 +10,7 @@
     font-size: 1.5rem;
     gap: 1rem;
     line-height: 2rem;
-    overflow-wrap: anywhere;
+    width: 100%;
 
     .author{
       display: flex;
@@ -38,14 +38,31 @@
       color: var(--text);
       display: flex;
       flex-direction: row;
-      gap: 3rem;
+      gap: 2rem;
+      align-items: center;
 
       .like{
         font-size: 1.5rem;
+        margin-left: -1.5rem;
       }
       .dislike{
         font-size: 1.5rem;
+        margin-left: -1.5rem;
+      }
+      .svg{
+        width: 2.2rem;
+        fill: var(--def-black);
       }
     }
   }
+  .info{
+    visibility: hidden;
+    stroke: var(--text);
+    fill: var(--text);
+    height: 1.8rem;
+    margin-bottom:auto;
+  }
+}
+.comment:hover .info{
+  visibility: visible;
 }

@@ -1,7 +1,13 @@
 import React from 'react';
 
-const SvgSelector = ({ id, className, style }) => {
-  const svgMap = {
+type TSvgSelectorProps = {
+  id: string;
+  className?: string;
+  style?: Record<string, string>;
+};
+
+const SvgSelector: React.FC<TSvgSelectorProps> = ({ id, className, style }) => {
+  const svgMap: Record<string, JSX.Element> = {
     profile: (
       <svg className={className} style={style} viewBox="0 0 116 150.99">
         <g>
@@ -9,8 +15,8 @@ const SvgSelector = ({ id, className, style }) => {
             d="M67.9,140.31c-8.06-2.05-16.15-7.52-16.89-16.45-.92-11.08,9-18.56,17.92-23,11-5.48,24.09-7.41,36.24-6.59,13.4.9,29.08,5.14,38.48,15.32,6.54,7.07,7.39,17.39.51,24.66-3.3,3.49-7.5,4.9-12,6.05-6.3,1.62-13.61,1.15-20.06,1.32-8.36.23-16.73.12-25.09,0C80.84,141.47,73.9,141.85,67.9,140.31Z"
             transform="translate(-41.96 0.24)"
             fill="none"
-            stroke-miterlimit="10"
-            stroke-width="18"
+            strokeMiterlimit="10"
+            strokeWidth="18"
           />
           <ellipse
             cx="57.56"
@@ -18,8 +24,8 @@ const SvgSelector = ({ id, className, style }) => {
             rx="27.1"
             ry="27.01"
             fill="none"
-            stroke-miterlimit="10"
-            stroke-width="18"
+            strokeMiterlimit="10"
+            strokeWidth="18"
           />
         </g>
       </svg>
@@ -309,7 +315,7 @@ const SvgSelector = ({ id, className, style }) => {
             dur="1s"
             values="0 50 50;360 50 50"
             keyTimes="0;1"
-          ></animateTransform>
+          />
         </circle>
       </svg>
     ),
@@ -330,7 +336,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="10;0"
             keySplines="0 0.5 0.5 1"
             begin="0s"
-          ></animate>
+          />
           <animate
             attributeName="fill"
             repeatCount="indefinite"
@@ -339,7 +345,7 @@ const SvgSelector = ({ id, className, style }) => {
             keyTimes="0;0.25;0.5;0.75;1"
             values="#ccd5de;#e5eaef;#e1e6ec;#d9e0e6;#ccd5de"
             begin="0s"
-          ></animate>
+          />
         </circle>
         <circle cx="16" cy="50" r="10" fill="#ccd5de">
           <animate
@@ -351,7 +357,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="0;0;10;10;10"
             keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
             begin="0s"
-          ></animate>
+          />
           <animate
             attributeName="cx"
             repeatCount="indefinite"
@@ -361,7 +367,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="16;16;16;50;84"
             keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
             begin="0s"
-          ></animate>
+          />
         </circle>
         <circle cx="50" cy="50" r="10" fill="#d9e0e6">
           <animate
@@ -373,7 +379,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="0;0;10;10;10"
             keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
             begin="-0.3623188405797101s"
-          ></animate>
+          />
           <animate
             attributeName="cx"
             repeatCount="indefinite"
@@ -383,7 +389,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="16;16;16;50;84"
             keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
             begin="-0.3623188405797101s"
-          ></animate>
+          />
         </circle>
         <circle cx="84" cy="50" r="10" fill="#e1e6ec">
           <animate
@@ -395,7 +401,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="0;0;10;10;10"
             keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
             begin="-0.7246376811594202s"
-          ></animate>
+          />
           <animate
             attributeName="cx"
             repeatCount="indefinite"
@@ -405,7 +411,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="16;16;16;50;84"
             keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
             begin="-0.7246376811594202s"
-          ></animate>
+          />
         </circle>
         <circle cx="16" cy="50" r="10" fill="#e5eaef">
           <animate
@@ -417,7 +423,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="0;0;10;10;10"
             keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
             begin="-1.0869565217391304s"
-          ></animate>
+          />
           <animate
             attributeName="cx"
             repeatCount="indefinite"
@@ -427,7 +433,7 @@ const SvgSelector = ({ id, className, style }) => {
             values="16;16;16;50;84"
             keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
             begin="-1.0869565217391304s"
-          ></animate>
+          />
         </circle>
       </svg>
     ),
@@ -448,7 +454,6 @@ const SvgSelector = ({ id, className, style }) => {
         className={className}
         style={style}
       >
-        <defs></defs>
         <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
           <path
             d="M 45 0 C 20.147 0 0 20.147 0 45 c 0 24.853 20.147 45 45 45 s 45 -20.147 45 -45 C 90 20.147 69.853 0 45 0 z M 50.427 70 H 39.573 V 59.927 h 10.854 V 70 z M 50.427 51.978 H 39.573 V 20 h 10.854 V 51.978 z"
@@ -466,6 +471,104 @@ const SvgSelector = ({ id, className, style }) => {
     burger: (
       <svg viewBox="0 0 50 50" className={className} style={style}>
         <path d="M 2 9 L 2 11 L 48 11 L 48 9 L 2 9 z M 2 24 L 2 26 L 48 26 L 48 24 L 2 24 z M 2 39 L 2 41 L 48 41 L 48 39 L 2 39 z" />
+      </svg>
+    ),
+
+    likeOff: (
+      <svg
+        className={className}
+        style={style}
+        focusable="false"
+        viewBox="0 0 24 24"
+        strokeWidth="0.1"
+      >
+        <path d="m13.11 5.72-.57 2.89c-.12.59.04 1.2.42 1.66.38.46.94.73 1.54.73H20v1.08L17.43 18H9.34c-.18 0-.34-.16-.34-.34V9.82l4.11-4.1M14 2 7.59 8.41C7.21 8.79 7 9.3 7 9.83v7.83C7 18.95 8.05 20 9.34 20h8.1c.71 0 1.36-.37 1.72-.97l2.67-6.15c.11-.25.17-.52.17-.8V11c0-1.1-.9-2-2-2h-5.5l.92-4.65c.05-.22.02-.46-.08-.66-.23-.45-.52-.86-.88-1.22L14 2zM4 9H2v11h2c.55 0 1-.45 1-1v-9c0-.55-.45-1-1-1z" />
+      </svg>
+    ),
+
+    likeOn: (
+      <svg
+        className={className}
+        style={style}
+        focusable="false"
+        viewBox="0 0 24 24"
+        strokeWidth="0.1"
+      >
+        <path d="M2 20h2c.55 0 1-.45 1-1v-9c0-.55-.45-1-1-1H2v11zm19.83-7.12c.11-.25.17-.52.17-.8V11c0-1.1-.9-2-2-2h-5.5l.92-4.65c.05-.22.02-.46-.08-.66-.23-.45-.52-.86-.88-1.22L14 2 7.59 8.41C7.21 8.79 7 9.3 7 9.83v7.84C7 18.95 8.05 20 9.34 20h8.11c.7 0 1.36-.37 1.72-.97l2.66-6.15z" />
+      </svg>
+    ),
+
+    dislikeOff: (
+      <svg
+        className={className}
+        style={style}
+        focusable="false"
+        viewBox="0 0 24 24"
+        strokeWidth="0.1"
+      >
+        <path d="m10.89 18.28.57-2.89c.12-.59-.04-1.2-.42-1.66-.38-.46-.94-.73-1.54-.73H4v-1.08L6.57 6h8.09c.18 0 .34.16.34.34v7.84l-4.11 4.1M10 22l6.41-6.41c.38-.38.59-.89.59-1.42V6.34C17 5.05 15.95 4 14.66 4h-8.1c-.71 0-1.36.37-1.72.97l-2.67 6.15c-.11.25-.17.52-.17.8V13c0 1.1.9 2 2 2h5.5l-.92 4.65c-.05.22-.02.46.08.66.23.45.52.86.88 1.22L10 22zm10-7h2V4h-2c-.55 0-1 .45-1 1v9c0 .55.45 1 1 1z" />
+      </svg>
+    ),
+
+    dislikeOn: (
+      <svg
+        className={className}
+        style={style}
+        focusable="false"
+        viewBox="0 0 24 24"
+        strokeWidth="0.1"
+      >
+        <path d="M22 4h-2c-.55 0-1 .45-1 1v9c0 .55.45 1 1 1h2V4zM2.17 11.12c-.11.25-.17.52-.17.8V13c0 1.1.9 2 2 2h5.5l-.92 4.65c-.05.22-.02.46.08.66.23.45.52.86.88 1.22L10 22l6.41-6.41c.38-.38.59-.89.59-1.42V6.34C17 5.05 15.95 4 14.66 4h-8.1c-.71 0-1.36.37-1.72.97l-2.67 6.15z" />
+      </svg>
+    ),
+
+    more: (
+      <svg
+        className={className}
+        style={style}
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <g>
+          <circle cx="12" cy="12" r="2" />
+          <circle cx="12" cy="21" r="2" />
+          <circle cx="12" cy="3" r="2" />
+        </g>
+      </svg>
+    ),
+
+    checkboxChecked: (
+      <svg className={className} style={style} viewBox="0 0 400 400">
+        <circle
+          cx="200"
+          cy="200"
+          r="190"
+          fill="none"
+          stroke="#77c0af"
+          strokeMiterlimit="10"
+          strokeWidth="15"
+        />
+        <polyline
+          points="290 107 170 293 103 224"
+          fill="none"
+          stroke="#77c0af"
+          strokeMiterlimit="10"
+          strokeWidth="28"
+        />
+      </svg>
+    ),
+
+    checkboxUnchecked: (
+      <svg className={className} style={style} viewBox="0 0 400 400">
+        <circle
+          cx="200"
+          cy="200"
+          r="190"
+          fill="none"
+          stroke="#e6e6e6"
+          strokeMiterlimit="10"
+          strokeWidth="15"
+        />
       </svg>
     ),
   };
