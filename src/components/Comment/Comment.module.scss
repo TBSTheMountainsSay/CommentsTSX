@@ -55,6 +55,21 @@
       }
     }
   }
+  .wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 6rem;
+    width: 6rem;
+    margin: 0 -2.5rem;
+    :global(.bubbles){
+      div{
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+  }
+
   .info{
     visibility: hidden;
     stroke: var(--text);

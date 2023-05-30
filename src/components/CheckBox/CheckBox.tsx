@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './CheckBox.module.scss';
 import SvgSelector from '../SvgSelector/SvgSelector';
 import clsx from 'clsx';
-import { TComment } from '../../features/comments/Comments.types';
+import { useBubbles } from '../../hooks/useBubble';
 
 type TCheckBoxProps = {
   checked: boolean;
@@ -19,31 +19,22 @@ const CheckBox: React.FC<TCheckBoxProps> = ({
   checkedIcon,
   className,
 }) => {
-  const [bubbles, setBubbles] = useState<number[]>([]);
+  const { bubblesElement, startAnimation } = useBubbles();
 
   return (
-    <div className={styles.wrapper}>
+    <div className="wrapper">
       <button
         className={clsx(className, styles.checkbox)}
         onClick={() => {
           onCheckboxClick();
-          setBubbles([...bubbles, 1]);
-          setTimeout(() => {
-            const bubbleCopy = [...bubbles];
-            bubbleCopy.unshift();
-            setBubbles(bubbleCopy);
-          }, 500);
+          startAnimation();
         }}
       >
         {checked
           ? checkedIcon || <SvgSelector id={'checkboxChecked'} />
           : icon || <SvgSelector id={'checkboxUnchecked'} />}
       </button>
-      <div className={styles.bubbles}>
-        {bubbles.map((bubble) => (
-          <div />
-        ))}
-      </div>
+      {bubblesElement}
     </div>
   );
 };

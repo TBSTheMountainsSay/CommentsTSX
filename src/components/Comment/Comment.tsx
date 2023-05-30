@@ -4,6 +4,8 @@ import { TComment } from '../../features/comments/Comments.types';
 import Circle from 'src/components/Circle/Circle';
 import SvgSelector from 'src/components/SvgSelector/SvgSelector';
 import CheckBox from '../CheckBox/CheckBox';
+import { useBubbles } from '../../hooks/useBubble';
+import clsx from 'clsx';
 
 interface TCommentProps extends TComment {
   handleLike: () => void;
@@ -22,6 +24,8 @@ const Comment: React.FC<TCommentProps> = ({
   handleLike,
   handleDislike,
 }) => {
+  const { bubblesElement, startAnimation } = useBubbles();
+
   return (
     <li className={styles.comment}>
       <Circle />
@@ -51,7 +55,12 @@ const Comment: React.FC<TCommentProps> = ({
           <div className={styles.dislike}> {dislike}</div>
         </div>
       </div>
-      <SvgSelector id={'more'} className={styles.info} />
+      <div className={clsx('wrapper', styles.wrapper)}>
+        <button onClick={startAnimation}>
+          <SvgSelector id={'more'} className={styles.info} />
+        </button>
+        {bubblesElement}
+      </div>
     </li>
   );
 };
