@@ -1,14 +1,14 @@
 import React from 'react';
-import 'src/CSS/reset.scss';
-import 'src/CSS/global.scss';
-import 'src/CSS/color.scss';
+import 'src/css/reset.scss';
+import 'src/css/global.scss';
+import 'src/css/color.scss';
 import './App.css';
-import Wrapper from './Components/Wrapper/Wrapper';
+import Comments from './features/comments/Comments';
 
 function App() {
   return (
     <div className="App">
-      <Wrapper />
+      <Comments />
     </div>
   );
 }

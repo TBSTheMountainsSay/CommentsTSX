@@ -1,0 +1,12 @@
+.checkbox{
+  min-width: 3.5rem;
+  min-height: 3.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkbox:hover{
+  background-color: var(--hover);
+  border-radius: 100%;
+}

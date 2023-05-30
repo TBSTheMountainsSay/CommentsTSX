@@ -1,20 +1,31 @@
 .createComment{
   display: flex;
-  align-items: center;
-  flex-direction: column;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: start;
+  margin: 5rem 0 1.6rem 0;
+
+  .content{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
 
   .textarea{
-    margin: 5rem 0 1rem 0;
+    position: relative;
+    width: 100%;
+    margin-bottom: 1rem;
+
     textarea{
       font-size: 1.5rem;
       font-weight: 400;
-      width: 100rem;
+      width: 100%;
       border-bottom: 1px solid var(--back);
       height: 1.5rem;
       resize: none;
       overflow: hidden;
       padding-bottom: 1rem;
-      position: relative;
       display: block;
     }
   }
@@ -32,7 +43,7 @@
   }
 
   .textarea:focus-within:after{
-    width:100rem;
+    width:100%;
   }
 
   .hidden{
@@ -45,11 +56,13 @@
     display: flex;
 
     button{
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       padding: 0 1.5rem;
       border-radius: 1.8rem;
       height: 3.6rem;
       transition: .3s;
+      font-weight: 500;
+
     }
     .cancel{
 
@@ -68,6 +81,7 @@
     .disabled{
       background-color: var(--back);
       color: var(--text);
+
     }
   }
 

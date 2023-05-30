@@ -6,6 +6,8 @@
   --dark-grey: #575757;
   --blue: #0556BF;
   --light-blue: #065FD4;
+  --black: #585858;
+  --grey20: rgba(229, 229, 229, 0.2);
 
 
   /*theme*/
@@ -15,4 +17,6 @@
   --text: var(--light-grey);
   --button: var(--blue);
   --hover-button: var(--light-blue);
+  --def-black: var(--black);
+  --hover: var(--grey20)
 }
