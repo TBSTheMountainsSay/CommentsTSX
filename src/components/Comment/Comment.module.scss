@@ -8,9 +8,11 @@
     display: flex;
     flex-direction: column;
     font-size: 1.5rem;
-    gap: 1rem;
+    gap: 0.5rem;
     line-height: 2rem;
     width: 100%;
+    word-wrap: break-word;
+    overflow-x:hidden;
 
     .author{
       display: flex;
@@ -34,6 +36,7 @@
         margin-left: 1rem;
       }
     }
+
     .activity{
       color: var(--text);
       display: flex;

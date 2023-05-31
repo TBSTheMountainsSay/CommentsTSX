@@ -1,6 +1,6 @@
 import styles from './CreateComment.module.scss';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Circle from '../../../components/Circle/Circle';
 
 type TCreateCommentProps = {
@@ -20,6 +20,16 @@ const CreateComment: React.FC<TCreateCommentProps> = ({
   handleCancel,
   handleAddComment,
 }) => {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (textareaRef && textareaRef.current) {
+      textareaRef.current.style.height = '1.5rem';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = scrollHeight + 'px';
+    }
+  }, [comment]);
+
   return (
     <div className={styles.createComment}>
       <Circle />
@@ -29,6 +39,7 @@ const CreateComment: React.FC<TCreateCommentProps> = ({
             placeholder={'Введите комментарий'}
             onChange={handleChangeComment}
             value={comment}
+            ref={textareaRef}
           />
         </div>
 
