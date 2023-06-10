@@ -34,6 +34,7 @@
         font-weight: 400;
         line-height: 1.8rem;
         margin-left: 1rem;
+        color: var(--text);
       }
     }
 
@@ -65,11 +66,23 @@
     height: 6rem;
     width: 6rem;
     margin: 0 -2.5rem;
+    position: relative;
     :global(.bubbles){
       div{
         width: 5rem;
         height: 5rem;
       }
+    }
+
+    .visible{
+      position: absolute;
+      display: block;
+      left: 0.5rem;
+      top: 5.5rem;
+    }
+
+    .invisible{
+      display: none;
     }
   }
 
@@ -84,3 +97,13 @@
 .comment:hover .info{
   visibility: visible;
 }
+
+@media (max-width: 1200px){
+  .visible{
+    position: absolute;
+    display: block;
+    right: 1.5rem;
+    top: 5.5rem;
+  }
+}
+

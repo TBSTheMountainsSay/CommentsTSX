@@ -1,0 +1,29 @@
+.menu{
+  background-color: var(--def);
+  -webkit-box-shadow: 0 0 2.5rem 0 rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 0 0 2.5rem 0 rgba(34, 60, 80, 0.2);
+  box-shadow: 0 0 2.5rem 0 rgba(34, 60, 80, 0.2);
+  height: 11rem;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 1rem;
+
+  .button{
+    background-color: var(--def);
+    font-size: 1.5rem;
+    padding: 1rem 4rem 1rem 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    .svg{
+      width: 2.5rem;
+      fill: var(--def-black);
+      padding: 0 2rem;
+    }
+  }
+  .button:hover{
+    background-color: var(--back);
+  }
+}

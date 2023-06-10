@@ -23,11 +23,12 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
   const [comments, setComments] = useState<TComment[]>(initialState);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [comment, setComment] = useState<string>('');
+  const [unicID, setInicID] = useState<number>(1);
 
   const emptyComment: string = '';
 
   const emptyObj = {
-    id: 1,
+    id: unicID,
     name: 'Ваня',
     lastName: 'Пашкин',
     data: comment,
@@ -56,6 +57,7 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     setComments([...comments, emptyObj]);
     setComment(emptyComment);
     setIsActive(false);
+    setInicID(unicID + 1);
   };
 
   const handleLike = (id: number) => {
