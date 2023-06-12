@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './Comments.module.scss';
 import CreateComment from './CreateComment/CreateComment';
 import Comment from '../../components/Comment/Comment';
@@ -24,6 +24,7 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [comment, setComment] = useState<string>('');
   const [unicID, setInicID] = useState<number>(1);
+  const [isActiveMenu, setIsActiveMenu] = useState<number | undefined>();
 
   const emptyComment: string = '';
 
@@ -78,6 +79,10 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     );
   };
 
+  const handleMenuButton = (id: number) => {
+    id === isActiveMenu ? setIsActiveMenu(undefined) : setIsActiveMenu(id);
+  };
+
   return (
     <div className={styles.wrapper}>
       <CreateComment
@@ -91,6 +96,7 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
       <ul>
         {comments.map((comment) => (
           <Comment
+            isActiveMenu={isActiveMenu === comment.id}
             id={comment.id}
             name={comment.name}
             lastName={comment.lastName}
@@ -102,6 +108,7 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
             dislike={comment.dislike}
             handleLike={() => handleLike(comment.id)}
             handleDislike={() => handleDislike(comment.id)}
+            handleMenuButton={() => handleMenuButton(comment.id)}
           />
         ))}
       </ul>

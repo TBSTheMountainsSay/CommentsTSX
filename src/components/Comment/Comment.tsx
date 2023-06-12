@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './Comment.module.scss';
 import { TComment } from '../../features/comments/Comments.types';
 import Circle from 'src/components/Circle/Circle';
@@ -7,10 +7,13 @@ import CheckBox from '../CheckBox/CheckBox';
 import { useBubbles } from '../../hooks/useBubble';
 import clsx from 'clsx';
 import ModalMenu from '../ModalMenu/ModalMenu';
+import useClickAway from '../../hooks/useClickAway';
 
 interface TCommentProps extends TComment {
   handleLike: () => void;
   handleDislike: () => void;
+  handleMenuButton: () => void;
+  isActiveMenu: boolean;
 }
 
 const Comment: React.FC<TCommentProps> = ({
@@ -24,13 +27,14 @@ const Comment: React.FC<TCommentProps> = ({
   dislike,
   handleLike,
   handleDislike,
+  handleMenuButton,
+  isActiveMenu,
 }) => {
   const { bubblesElement, startAnimation } = useBubbles();
-  const [isActiveMenu, setIsActiveMenu] = useState<boolean>(false);
-
-  const handleMenuButton = () => {
-    setIsActiveMenu(!isActiveMenu);
-  };
+  const refElement = useClickAway(() => {
+    if (!isActiveMenu) return;
+    handleMenuButton();
+  });
 
   return (
     <li className={styles.comment}>
@@ -64,6 +68,7 @@ const Comment: React.FC<TCommentProps> = ({
       <div
         className={clsx('wrapper', styles.wrapper)}
         onClick={handleMenuButton}
+        ref={refElement}
       >
         <button onClick={startAnimation}>
           <SvgSelector id={'more'} className={styles.info} />
@@ -76,7 +81,6 @@ const Comment: React.FC<TCommentProps> = ({
         >
           <ModalMenu />
         </div>
-
         {bubblesElement}
       </div>
     </li>

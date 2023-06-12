@@ -73,12 +73,15 @@
         height: 5rem;
       }
     }
-
     .visible{
       position: absolute;
       display: block;
       left: 0.5rem;
       top: 5.5rem;
+    @media (max-width: 1200px){
+        right: 0.5rem;
+        left: unset;
+      }
     }
 
     .invisible{
@@ -98,12 +101,6 @@
   visibility: visible;
 }
 
-@media (max-width: 1200px){
-  .visible{
-    position: absolute;
-    display: block;
-    right: 1.5rem;
-    top: 5.5rem;
-  }
-}
+
+
 
