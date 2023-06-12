@@ -1,22 +1,42 @@
-:root{
-  /*palette*/
-  --white: #fff;
-  --grey: #E5E5E5;
-  --light-grey: #84909F;
-  --dark-grey: #575757;
-  --blue: #0556BF;
-  --light-blue: #065FD4;
-  --black: #585858;
-  --grey20: rgba(229, 229, 229, 0.2);
+$palette:(
+  white: #fff,
+  grey: #E5E5E5,
+  light-grey: #84909F,
+  dark-grey: #575757,
+  blue: #0556BF,
+  light-blue: #065FD4,
+  black: #585858,
+  grey20: rgba(229, 229, 229, 0.2),
+  red:red,
+);
 
+$light-theme:(
+  bubble:#E5E5E5,
+  modal:map-get($palette, white),
+  avatar:map-get($palette, grey),
+  border: map-get($palette, grey),
+  def: map-get($palette, white),
+  back: map-get($palette, white),
+  main-text: map-get($palette, dark-grey),
+  text: map-get($palette, light-grey),
+  button: map-get($palette, blue),
+  hover-button: map-get($palette, light-blue),
+  def-black: map-get($palette, black),
+  hover: map-get($palette, grey20),
+);
 
-  /*theme*/
-  --def: var(--white);
-  --back: var(--grey);
-  --main-text: var(--dark-grey);
-  --text: var(--light-grey);
-  --button: var(--blue);
-  --hover-button: var(--light-blue);
-  --def-black: var(--black);
-  --hover: var(--grey20)
-}
+$dark-theme:(
+  bubble:rgba(229, 229, 229, 0.35),
+  modal:#282828,
+  avatar: #797979,
+  border: map-get($palette, grey20),
+  def: #0f0f0f,
+  back: #0f0f0f,
+  main-text: map-get($palette, grey),
+  text: #aaa,
+  button: map-get($palette, blue),
+  hover-button: map-get($palette, light-blue),
+  def-black: #f1f1f1,
+  hover: map-get($palette, grey20),
+);
+

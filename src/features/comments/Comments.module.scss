@@ -1,15 +1,40 @@
-.wrapper{
+.wrapper {
   width: 120rem;
   min-height: 100vh;
   background-color: var(--def);
   display: flex;
   flex-direction: column;
   padding: 0 10rem;
+  align-items: end;
+
+  .theme_switch_wrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    justify-self: end;
+
+    :global(.bubbles) {
+      div {
+        width: 4rem;
+        height: 4rem;
+      }
+    }
+
+    > button {
+      width: 2rem;
+
+      .theme_switch {
+        fill: var(--def-black)
+      }
+    }
+  }
 
 }
 
-@media (max-width: 768px){
-  .wrapper{
+@media (max-width: 768px) {
+  .wrapper {
     padding: 0 1.5rem;
   }
 }

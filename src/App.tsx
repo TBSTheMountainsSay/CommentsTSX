@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'src/css/reset.scss';
 import 'src/css/global.scss';
 import 'src/css/color.scss';
-import './App.css';
+import './App.scss';
 import Comments from './features/comments/Comments';
 
 function App() {

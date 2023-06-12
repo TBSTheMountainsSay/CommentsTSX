@@ -1,3 +1,6 @@
+@import "color";
+@import "functions";
+
 *, *:after, *:before {
   font-size: calc(3px + 7 * (100vw / 1920));
   font-family: "Roboto",sans-serif;
@@ -29,7 +32,7 @@
 .bubbles{
   div{
     position: absolute;
-    background-color: var(--back);
+    background-color: var(--bubble);
     width: 3.5rem;
     height: 3.5rem;
     border-radius: 100%;
@@ -47,4 +50,30 @@
   0%{transform: scale(0); opacity:0}
   50%{opacity:1}
   100%{transform: scale(1); opacity:0}
+}
+
+:root {
+  @each $name, $color in $light-theme {
+    --#{$name}: #{$color};
+  }
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    @each $name, $color in $dark-theme {
+      --#{$name}: #{$color};
+    } color-scheme:dark;
+  }
+}
+:root[color-scheme="light"] {
+  @each $name, $color in $light-theme {
+    --#{$name}: #{$color};
+  }
+  color-scheme:light;
+}
+:root[color-scheme="dark"] {
+  @each $name, $color in $dark-theme {
+    --#{$name}: #{$color};
+  }
+  color-scheme:dark;
 }

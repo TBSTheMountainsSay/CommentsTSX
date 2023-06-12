@@ -1,8 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import styles from './Comments.module.scss';
 import CreateComment from './CreateComment/CreateComment';
 import Comment from '../../components/Comment/Comment';
 import { TComment } from './Comments.types';
+import { useThemeDetector } from '../../hooks/useThemeDetector';
+import SvgSelector from '../../components/SvgSelector/SvgSelector';
+import clsx from 'clsx';
+import { useBubbles } from '../../hooks/useBubble';
 
 type TWrapperProps = {};
 
@@ -20,11 +24,23 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     },
   ];
 
+  const { bubblesElement, startAnimation } = useBubbles();
+  const systemTheme = useThemeDetector();
+  const localStorageTheme = window.localStorage.getItem('isDarkTheme');
+  const initialTheme = localStorageTheme || systemTheme;
+
   const [comments, setComments] = useState<TComment[]>(initialState);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [comment, setComment] = useState<string>('');
   const [unicID, setInicID] = useState<number>(1);
   const [isActiveMenu, setIsActiveMenu] = useState<number | undefined>();
+  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(
+    initialTheme === 'dark'
+  );
+  document.documentElement.setAttribute(
+    'color-scheme',
+    isDarkTheme ? 'dark' : 'light'
+  );
 
   const emptyComment: string = '';
 
@@ -83,8 +99,24 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     id === isActiveMenu ? setIsActiveMenu(undefined) : setIsActiveMenu(id);
   };
 
+  const handleChangeTheme = () => {
+    startAnimation();
+    const newTheme = !isDarkTheme;
+    setIsDarkTheme(newTheme);
+    window.localStorage.setItem('isDarkTheme', newTheme ? 'dark' : 'light');
+  };
+
   return (
     <div className={styles.wrapper}>
+      <div className={clsx('wrapper', styles.theme_switch_wrapper)}>
+        <button onClick={handleChangeTheme}>
+          <SvgSelector
+            id={isDarkTheme ? 'dark_mode' : 'light_mode'}
+            className={styles.theme_switch}
+          />
+        </button>
+        {bubblesElement}
+      </div>
       <CreateComment
         isActive={isActive}
         handleIsActive={handleIsActive}
