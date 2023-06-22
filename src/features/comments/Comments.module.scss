@@ -7,33 +7,22 @@
   padding: 0 10rem;
   align-items: end;
 
-  ul{
+  ul {
     width: 100%;
   }
 
-  .theme_switch_wrapper {
+  .buttons {
     margin-top: 2rem;
     display: flex;
-    justify-content: center;
+    flex-direction: row;
+    gap: 2rem;
     align-items: center;
-    position: relative;
-    justify-self: end;
+    justify-content: center;
 
-    :global(.bubbles) {
-      position: absolute;
-      width: 4rem;
-      height: 4rem;
-      pointer-events: none;
-    }
-
-    > button {
-      width: 2rem;
-      .theme_switch {
-        fill: var(--def-black)
-      }
+    button {
+      font-size: 1.5rem;
     }
   }
-
 }
 
 @media (max-width: 768px) {

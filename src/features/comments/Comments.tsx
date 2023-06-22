@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styles from './Comments.module.scss';
 import CreateComment from './CreateComment/CreateComment';
 import Comment from '../../components/Comment/Comment';
 import { TComment } from './Comments.types';
 import { useThemeDetector } from '../../hooks/useThemeDetector';
-import SvgSelector from '../../components/SvgSelector/SvgSelector';
-import clsx from 'clsx';
 import { useBubbles } from '../../hooks/useBubble';
+import { TLanguage } from '../../App';
+import LanguagesSwitcher from '../../components/Buttons/LanguageSwitcher/LanguagesSwitcher';
+import ThemeSwitcher from '../../components/Buttons/ThemeSwitcher/ThemeSwitcher';
 
-type TWrapperProps = {};
+type TCommentsProps = {
+  language: TLanguage;
+  handleChangeLanguage: () => void;
+};
 
-const Comments: React.FC<TWrapperProps> = ({}) => {
+const Comments: React.FC<TCommentsProps> = ({
+  handleChangeLanguage,
+  language,
+}) => {
   const userId = 0;
 
   const initialState = [
@@ -69,94 +76,112 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     dislikes: [],
   };
 
-  const handleIsActive = () => {
+  const handleIsActive = useCallback(() => {
     setIsActive(true);
-  };
+  }, []);
 
-  const handleChangeComment = (
-    еvent: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    setComment(еvent.target.value);
-  };
+  const handleChangeComment = useCallback(
+    (еvent: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setComment(еvent.target.value);
+    },
+    []
+  );
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setComment(emptyComment);
     setIsActive(false);
-  };
+  }, []);
 
-  const handleAddComment = () => {
+  const handleAddComment = useCallback(() => {
     setComments([...comments, emptyObj]);
     setComment(emptyComment);
     setIsActive(false);
     setInicID(unicID + 1);
-  };
+  }, [comments, emptyObj, unicID]);
 
-  const reactionToggle = (likes: number[]) => {
-    if (likes.includes(userId)) {
-      return likes.filter((id) => userId !== id);
-    } else {
-      return [...likes, userId];
-    }
-  };
+  const reactionToggle = useCallback(
+    (likes: number[]) => {
+      if (likes.includes(userId)) {
+        return likes.filter((id) => userId !== id);
+      } else {
+        return [...likes, userId];
+      }
+    },
+    [userId]
+  );
 
-  const handleLike = (id: number) => {
-    setComments(
-      comments.map((comment) =>
-        comment.id === id
-          ? {
-              ...comment,
-              likes: reactionToggle(comment.likes),
-              dislikes: comment.dislikes.includes(userId)
-                ? reactionToggle(comment.dislikes)
-                : comment.dislikes,
-            }
-          : comment
-      )
-    );
-  };
+  const handleLike = useCallback(
+    (id: number) => {
+      setComments(
+        comments.map((comment) =>
+          comment.id === id
+            ? {
+                ...comment,
+                likes: reactionToggle(comment.likes),
+                dislikes: comment.dislikes.includes(userId)
+                  ? reactionToggle(comment.dislikes)
+                  : comment.dislikes,
+              }
+            : comment
+        )
+      );
+    },
+    [comments, reactionToggle]
+  );
 
-  const handleDislike = (id: number) => {
-    setComments(
-      comments.map((comment) =>
-        comment.id === id
-          ? {
-              ...comment,
-              dislikes: reactionToggle(comment.dislikes),
-              likes: comment.likes.includes(userId)
-                ? reactionToggle(comment.likes)
-                : comment.likes,
-            }
-          : comment
-      )
-    );
-  };
+  const handleDislike = useCallback(
+    (id: number) => {
+      setComments(
+        comments.map((comment) =>
+          comment.id === id
+            ? {
+                ...comment,
+                dislikes: reactionToggle(comment.dislikes),
+                likes: comment.likes.includes(userId)
+                  ? reactionToggle(comment.likes)
+                  : comment.likes,
+              }
+            : comment
+        )
+      );
+    },
+    [comments, reactionToggle]
+  );
 
-  const handleMenuButton = (id: number) => {
-    id === isActiveMenu ? setIsActiveMenu(undefined) : setIsActiveMenu(id);
-  };
+  const handleMenuButton = useCallback(
+    (id: number) => {
+      id === isActiveMenu ? setIsActiveMenu(undefined) : setIsActiveMenu(id);
+    },
+    [isActiveMenu]
+  );
 
-  const handleChangeTheme = () => {
+  const handleChangeTheme = useCallback(() => {
     startAnimation();
     const newTheme = !isDarkTheme;
     setIsDarkTheme(newTheme);
     window.localStorage.setItem('isDarkTheme', newTheme ? 'dark' : 'light');
-  };
+  }, [isDarkTheme]);
 
-  const handleDeleteComment = (id: number) => {
-    setComments(comments.filter((comment) => comment.id !== id));
-  };
+  const handleDeleteComment = useCallback(
+    (id: number) => {
+      setComments(comments.filter((comment) => comment.id !== id));
+    },
+    [comments]
+  );
 
   return (
     <div className={styles.wrapper}>
-      <div className={clsx('wrapper', styles.theme_switch_wrapper)}>
-        <button onClick={handleChangeTheme}>
-          <SvgSelector
-            id={isDarkTheme ? 'dark_mode' : 'light_mode'}
-            className={styles.theme_switch}
-          />
-        </button>
-        {bubblesElement}
+      <div className={styles.buttons}>
+        <LanguagesSwitcher
+          handleChangeLanguage={handleChangeLanguage}
+          language={language}
+        />
+        <ThemeSwitcher
+          handleChangeTheme={handleChangeTheme}
+          isDarkTheme={isDarkTheme}
+        />
       </div>
+
       <CreateComment
         isActive={isActive}
         handleIsActive={handleIsActive}
