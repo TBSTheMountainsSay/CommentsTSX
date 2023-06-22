@@ -11,16 +11,32 @@ import { useBubbles } from '../../hooks/useBubble';
 type TWrapperProps = {};
 
 const Comments: React.FC<TWrapperProps> = ({}) => {
+  const userId = 0;
+
   const initialState = [
     {
-      id: 0,
+      id: 1,
       name: 'Паша',
       lastName: 'Ванин',
       data: 'Значит так: value, то бишь  каждый символ в textarea, мы берем из BLL, в стейте. Делаем мы это через props. Чтобы добавить каждый символ в стейт, т.е. наше value, мы используем обработчик onChange. Программируем наш onChange, чтобы value (символ который мы  нажали) передавался в стейт. Делаем это через функцию update, которая должна лежать со стейтом в BLL. Прокидываем эту функцию через props в нашу компоненту. В обработчике пишем,  вызови update(со значением value(символ)). т. е. то, что мы ввели, через функцию записывается в какой-то массив в стейте. А textarea говорит: О! Сейчас кто-то ввел символ и  мой value стал тем, что ввели. Быстренько отображаю это, в поле ввода. Получается, сначала поменялся state в BLL, а потом Ui в textarea. Это концепция Flux архитектуры.',
-      isLike: false,
-      like: 100,
-      isDislike: false,
-      dislike: 10,
+      likes: [0, 1, 3],
+      dislikes: [2],
+    },
+    {
+      id: 2,
+      name: 'Никита',
+      lastName: 'Широбоков',
+      data: 'ПРОВЕРКА 1',
+      likes: [1, 2],
+      dislikes: [0, 3],
+    },
+    {
+      id: 3,
+      name: 'Андрей',
+      lastName: 'Парыгин',
+      data: 'ПРОВЕРКА 2',
+      likes: [2, 3],
+      dislikes: [1],
     },
   ];
 
@@ -32,7 +48,7 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
   const [comments, setComments] = useState<TComment[]>(initialState);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [comment, setComment] = useState<string>('');
-  const [unicID, setInicID] = useState<number>(1);
+  const [unicID, setInicID] = useState<number>(4);
   const [isActiveMenu, setIsActiveMenu] = useState<number | undefined>();
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(
     initialTheme === 'dark'
@@ -49,10 +65,8 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     name: 'Ваня',
     lastName: 'Пашкин',
     data: comment,
-    isLike: false,
-    like: 10,
-    isDislike: false,
-    dislike: 2,
+    likes: [],
+    dislikes: [],
   };
 
   const handleIsActive = () => {
@@ -77,10 +91,26 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     setInicID(unicID + 1);
   };
 
+  const reactionToggle = (likes: number[]) => {
+    if (likes.includes(userId)) {
+      return likes.filter((id) => userId !== id);
+    } else {
+      return [...likes, userId];
+    }
+  };
+
   const handleLike = (id: number) => {
     setComments(
       comments.map((comment) =>
-        comment.id === id ? { ...comment, isLike: !comment.isLike } : comment
+        comment.id === id
+          ? {
+              ...comment,
+              likes: reactionToggle(comment.likes),
+              dislikes: comment.dislikes.includes(userId)
+                ? reactionToggle(comment.dislikes)
+                : comment.dislikes,
+            }
+          : comment
       )
     );
   };
@@ -89,7 +119,13 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     setComments(
       comments.map((comment) =>
         comment.id === id
-          ? { ...comment, isDislike: !comment.isDislike }
+          ? {
+              ...comment,
+              dislikes: reactionToggle(comment.dislikes),
+              likes: comment.likes.includes(userId)
+                ? reactionToggle(comment.likes)
+                : comment.likes,
+            }
           : comment
       )
     );
@@ -104,6 +140,10 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
     const newTheme = !isDarkTheme;
     setIsDarkTheme(newTheme);
     window.localStorage.setItem('isDarkTheme', newTheme ? 'dark' : 'light');
+  };
+
+  const handleDeleteComment = (id: number) => {
+    setComments(comments.filter((comment) => comment.id !== id));
   };
 
   return (
@@ -134,13 +174,12 @@ const Comments: React.FC<TWrapperProps> = ({}) => {
             lastName={comment.lastName}
             data={comment.data}
             key={comment.id}
-            isLike={comment.isLike}
-            like={comment.like}
-            isDislike={comment.isDislike}
-            dislike={comment.dislike}
+            likes={comment.likes}
+            dislikes={comment.dislikes}
             handleLike={() => handleLike(comment.id)}
             handleDislike={() => handleDislike(comment.id)}
             handleMenuButton={() => handleMenuButton(comment.id)}
+            handleDeleteComment={() => handleDeleteComment(comment.id)}
           />
         ))}
       </ul>

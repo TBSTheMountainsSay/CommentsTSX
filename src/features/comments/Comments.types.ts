@@ -3,8 +3,6 @@ export type TComment = {
   name: string;
   lastName: string;
   data: string;
-  isLike: boolean;
-  like: number;
-  isDislike: boolean;
-  dislike: number;
+  likes: number[];
+  dislikes: number[];
 };

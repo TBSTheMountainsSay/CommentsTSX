@@ -14,21 +14,23 @@ interface TCommentProps extends TComment {
   handleDislike: () => void;
   handleMenuButton: () => void;
   isActiveMenu: boolean;
+  handleDeleteComment: () => void;
 }
+
+const userId = 0;
 
 const Comment: React.FC<TCommentProps> = ({
   id,
   name,
   lastName,
   data,
-  isLike,
-  like,
-  isDislike,
-  dislike,
+  likes,
+  dislikes,
   handleLike,
   handleDislike,
   handleMenuButton,
   isActiveMenu,
+  handleDeleteComment,
 }) => {
   const { bubblesElement, startAnimation } = useBubbles();
   const refElement = useClickAway(() => {
@@ -48,21 +50,21 @@ const Comment: React.FC<TCommentProps> = ({
         {data}
         <div className={styles.activity}>
           <CheckBox
-            checked={isLike}
+            checked={likes.includes(userId)}
             onCheckboxClick={handleLike}
             icon={<SvgSelector id={'likeOff'} className={styles.svg} />}
             checkedIcon={<SvgSelector id={'likeOn'} className={styles.svg} />}
           />
-          <div className={styles.like}>{like}</div>
+          <div className={styles.like}>{likes.length}</div>
           <CheckBox
-            checked={isDislike}
+            checked={dislikes.includes(userId)}
             onCheckboxClick={handleDislike}
             icon={<SvgSelector id={'dislikeOff'} className={styles.svg} />}
             checkedIcon={
               <SvgSelector id={'dislikeOn'} className={styles.svg} />
             }
           />
-          <div className={styles.dislike}> {dislike}</div>
+          <div className={styles.dislike}> {dislikes.length}</div>
         </div>
       </div>
       <div
@@ -79,7 +81,7 @@ const Comment: React.FC<TCommentProps> = ({
             [styles.invisible]: !isActiveMenu,
           })}
         >
-          <ModalMenu />
+          <ModalMenu handleDeleteComment={handleDeleteComment} />
         </div>
         {bubblesElement}
       </div>

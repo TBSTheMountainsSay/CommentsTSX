@@ -2,9 +2,11 @@ import React from 'react';
 import styles from './ModalMenu.module.scss';
 import SvgSelector from '../SvgSelector/SvgSelector';
 
-type TModalProps = {};
+type TModalProps = {
+  handleDeleteComment: () => void;
+};
 
-const ModalMenu: React.FC<TModalProps> = ({}) => {
+const ModalMenu: React.FC<TModalProps> = ({ handleDeleteComment }) => {
   return (
     <div className={styles.menu}>
       <button className={styles.button}>
@@ -12,7 +14,7 @@ const ModalMenu: React.FC<TModalProps> = ({}) => {
         Изменить
       </button>
 
-      <button className={styles.button}>
+      <button className={styles.button} onClick={handleDeleteComment}>
         <SvgSelector id={'delete'} className={styles.svg} />
         Удалить
       </button>
