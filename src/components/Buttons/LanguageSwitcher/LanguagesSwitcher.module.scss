@@ -1,0 +1,22 @@
+.languages_switch_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  :global(.bubbles) {
+    position: absolute;
+    width: 4rem;
+    height: 4rem;
+    pointer-events: none;
+  }
+
+  > button {
+    width: 2rem;
+
+
+    .theme_switch {
+      fill: var(--def-black)
+    }
+  }
+}

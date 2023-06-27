@@ -6,10 +6,17 @@ import SvgSelector from 'src/components/SvgSelector/SvgSelector';
 import CheckBox from '../CheckBox/CheckBox';
 import { useBubbles } from '../../hooks/useBubble';
 import clsx from 'clsx';
+import ModalMenu from '../ModalMenu/ModalMenu';
+import useClickAway from '../../hooks/useClickAway';
 
 interface TCommentProps extends TComment {
   handleLike: () => void;
   handleDislike: () => void;
+  handleMenuButton: () => void;
+  isActiveMenu: boolean;
+  handleDeleteComment: () => void;
+  handleEditComment: () => void;
+  userId: number;
 }
 
 const Comment: React.FC<TCommentProps> = ({
@@ -17,14 +24,21 @@ const Comment: React.FC<TCommentProps> = ({
   name,
   lastName,
   data,
-  isLike,
-  like,
-  isDislike,
-  dislike,
+  likes,
+  dislikes,
   handleLike,
   handleDislike,
+  handleMenuButton,
+  isActiveMenu,
+  handleDeleteComment,
+  handleEditComment,
+  userId,
 }) => {
   const { bubblesElement, startAnimation } = useBubbles();
+  const refElement = useClickAway(() => {
+    if (!isActiveMenu) return;
+    handleMenuButton();
+  });
 
   return (
     <li className={styles.comment}>
@@ -38,27 +52,42 @@ const Comment: React.FC<TCommentProps> = ({
         {data}
         <div className={styles.activity}>
           <CheckBox
-            checked={isLike}
+            checked={likes.includes(userId)}
             onCheckboxClick={handleLike}
             icon={<SvgSelector id={'likeOff'} className={styles.svg} />}
             checkedIcon={<SvgSelector id={'likeOn'} className={styles.svg} />}
           />
-          <div className={styles.like}>{like}</div>
+          <div className={styles.like}>{likes.length}</div>
           <CheckBox
-            checked={isDislike}
+            checked={dislikes.includes(userId)}
             onCheckboxClick={handleDislike}
             icon={<SvgSelector id={'dislikeOff'} className={styles.svg} />}
             checkedIcon={
               <SvgSelector id={'dislikeOn'} className={styles.svg} />
             }
           />
-          <div className={styles.dislike}> {dislike}</div>
+          <div className={styles.dislike}> {dislikes.length}</div>
         </div>
       </div>
-      <div className={clsx('wrapper', styles.wrapper)}>
+      <div
+        className={clsx('wrapper', styles.wrapper)}
+        onClick={handleMenuButton}
+        ref={refElement}
+      >
         <button onClick={startAnimation}>
           <SvgSelector id={'more'} className={styles.info} />
         </button>
+        <div
+          className={clsx({
+            [styles.visible]: isActiveMenu,
+            [styles.invisible]: !isActiveMenu,
+          })}
+        >
+          <ModalMenu
+            handleDeleteComment={handleDeleteComment}
+            handleEditComment={handleEditComment}
+          />
+        </div>
         {bubblesElement}
       </div>
     </li>

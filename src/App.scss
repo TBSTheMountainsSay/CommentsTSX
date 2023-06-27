@@ -1,6 +1,8 @@
+@import "src/css/global";
+
 .App{
     background-color: var(--back);
     display: flex;
     justify-content: center;
-    height: 100%;
+    min-height: 100%;
 }

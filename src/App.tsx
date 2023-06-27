@@ -1,15 +1,38 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import 'src/css/reset.scss';
 import 'src/css/global.scss';
 import 'src/css/color.scss';
-import './App.css';
+import './App.scss';
 import Comments from './features/comments/Comments';
+import { messages } from './Languages/Languages';
+import { IntlProvider } from 'react-intl';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { changeLanguage } from './app.slice';
 
 function App() {
+  const dispatch = useAppDispatch();
+  const language = useAppSelector((state) => state.app.language);
+
+  // const [language, setLanguage] = useState<TLanguage>('ru');
+
+  const handleChangeLanguage = useCallback(() => {
+    // setLanguage(language === 'ru' ? 'en' : 'ru');
+    dispatch(changeLanguage());
+  }, []);
+
   return (
-    <div className="App">
-      <Comments />
-    </div>
+    <IntlProvider
+      messages={messages[language]}
+      locale={language}
+      defaultLocale="ru"
+    >
+      <div className="App">
+        <Comments
+          language={language}
+          handleChangeLanguage={handleChangeLanguage}
+        />
+      </div>
+    </IntlProvider>
   );
 }
 

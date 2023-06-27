@@ -1,0 +1,120 @@
+*, *:after, *:before {
+  font-size: calc(3px + 0.3645833333vw);
+  font-family: "Roboto", sans-serif;
+}
+
+@media (min-width: 1920px) {
+  *, *:after, *:before {
+    font-size: calc(2px + 0.4166666667vw);
+  }
+}
+@media (max-width: 1280px) {
+  *, *:after, *:before {
+    font-size: calc(4px + 0.3125vw);
+  }
+}
+@media (max-width: 480px) {
+  *, *:after, *:before {
+    font-size: calc(8px + 0.1041666667vw);
+  }
+}
+.wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.bubbles div {
+  position: absolute;
+  background-color: var(--bubble);
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  pointer-events: none;
+  z-index: -1;
+  animation: bubble 0.5s forwards;
+}
+
+@keyframes bubble {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+:root {
+  --bubble: #E5E5E5;
+  --modal: #fff;
+  --avatar: #E5E5E5;
+  --border: #E5E5E5;
+  --def: #fff;
+  --back: #fff;
+  --main-text: #575757;
+  --text: #84909F;
+  --button: #0556BF;
+  --hover-button: #065FD4;
+  --def-black: #585858;
+  --hover: rgba(229, 229, 229, 0.2);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bubble: rgba(229, 229, 229, 0.35);
+    --modal: #282828;
+    --avatar: #797979;
+    --border: rgba(229, 229, 229, 0.2);
+    --def: #0f0f0f;
+    --back: #0f0f0f;
+    --main-text: #E5E5E5;
+    --text: #aaa;
+    --button: #0556BF;
+    --hover-button: #065FD4;
+    --def-black: #f1f1f1;
+    --hover: rgba(229, 229, 229, 0.2);
+    color-scheme: dark;
+  }
+}
+:root[color-scheme=light] {
+  --bubble: #E5E5E5;
+  --modal: #fff;
+  --avatar: #E5E5E5;
+  --border: #E5E5E5;
+  --def: #fff;
+  --back: #fff;
+  --main-text: #575757;
+  --text: #84909F;
+  --button: #0556BF;
+  --hover-button: #065FD4;
+  --def-black: #585858;
+  --hover: rgba(229, 229, 229, 0.2);
+  color-scheme: light;
+}
+
+:root[color-scheme=dark] {
+  --bubble: rgba(229, 229, 229, 0.35);
+  --modal: #282828;
+  --avatar: #797979;
+  --border: rgba(229, 229, 229, 0.2);
+  --def: #0f0f0f;
+  --back: #0f0f0f;
+  --main-text: #E5E5E5;
+  --text: #aaa;
+  --button: #0556BF;
+  --hover-button: #065FD4;
+  --def-black: #f1f1f1;
+  --hover: rgba(229, 229, 229, 0.2);
+  color-scheme: dark;
+}
+
+/*# sourceMappingURL=global.css.map */
