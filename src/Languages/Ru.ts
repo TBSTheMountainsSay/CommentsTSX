@@ -4,4 +4,5 @@ export const ru = {
   edit: 'Изменить',
   delete_comment: 'Удалить',
   placeholder_comment: 'Введите комментарий',
+  save: 'Сохранить',
 };

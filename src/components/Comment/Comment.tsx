@@ -15,9 +15,9 @@ interface TCommentProps extends TComment {
   handleMenuButton: () => void;
   isActiveMenu: boolean;
   handleDeleteComment: () => void;
+  handleEditComment: () => void;
+  userId: number;
 }
-
-const userId = 0;
 
 const Comment: React.FC<TCommentProps> = ({
   id,
@@ -31,6 +31,8 @@ const Comment: React.FC<TCommentProps> = ({
   handleMenuButton,
   isActiveMenu,
   handleDeleteComment,
+  handleEditComment,
+  userId,
 }) => {
   const { bubblesElement, startAnimation } = useBubbles();
   const refElement = useClickAway(() => {
@@ -81,7 +83,10 @@ const Comment: React.FC<TCommentProps> = ({
             [styles.invisible]: !isActiveMenu,
           })}
         >
-          <ModalMenu handleDeleteComment={handleDeleteComment} />
+          <ModalMenu
+            handleDeleteComment={handleDeleteComment}
+            handleEditComment={handleEditComment}
+          />
         </div>
         {bubblesElement}
       </div>

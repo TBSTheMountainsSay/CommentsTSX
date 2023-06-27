@@ -4,4 +4,5 @@ export const en = {
   edit: 'Edit',
   delete_comment: 'Delete',
   placeholder_comment: 'Add a comment...',
+  save: 'Save',
 };

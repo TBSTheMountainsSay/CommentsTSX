@@ -6,15 +6,19 @@ import './App.scss';
 import Comments from './features/comments/Comments';
 import { messages } from './Languages/Languages';
 import { IntlProvider } from 'react-intl';
-
-export type TLanguage = 'ru' | 'en';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { changeLanguage } from './app.slice';
 
 function App() {
-  const [language, setLanguage] = useState<TLanguage>('ru');
+  const dispatch = useAppDispatch();
+  const language = useAppSelector((state) => state.app.language);
+
+  // const [language, setLanguage] = useState<TLanguage>('ru');
 
   const handleChangeLanguage = useCallback(() => {
-    setLanguage(language === 'ru' ? 'en' : 'ru');
-  }, [language]);
+    // setLanguage(language === 'ru' ? 'en' : 'ru');
+    dispatch(changeLanguage());
+  }, []);
 
   return (
     <IntlProvider

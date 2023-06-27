@@ -1,8 +1,8 @@
 import React from 'react';
 import styles from './LanguagesSwitcher.module.scss';
 import clsx from 'clsx';
-import { TLanguage } from '../../../App';
 import { useBubbles } from '../../../hooks/useBubble';
+import { TLanguage } from '../../../app.slice';
 
 type TLanguagesSwitcherProps = {
   language: TLanguage;

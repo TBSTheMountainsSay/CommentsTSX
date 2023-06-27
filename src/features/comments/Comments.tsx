@@ -5,9 +5,16 @@ import Comment from '../../components/Comment/Comment';
 import { TComment } from './Comments.types';
 import { useThemeDetector } from '../../hooks/useThemeDetector';
 import { useBubbles } from '../../hooks/useBubble';
-import { TLanguage } from '../../App';
 import LanguagesSwitcher from '../../components/Buttons/LanguageSwitcher/LanguagesSwitcher';
 import ThemeSwitcher from '../../components/Buttons/ThemeSwitcher/ThemeSwitcher';
+import { TLanguage } from '../../app.slice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import {
+  addComment,
+  addCommentThunk,
+  changeCommentData,
+  deleteComment,
+} from './comments.slice';
 
 type TCommentsProps = {
   language: TLanguage;
@@ -18,7 +25,11 @@ const Comments: React.FC<TCommentsProps> = ({
   handleChangeLanguage,
   language,
 }) => {
-  const userId = 0;
+  const dispatch = useAppDispatch();
+
+  const userId = useAppSelector((state) => state.app.userId);
+
+  const comments2 = useAppSelector((state) => state.commentsReducer.comments);
 
   const initialState = [
     {
@@ -54,7 +65,11 @@ const Comments: React.FC<TCommentsProps> = ({
 
   const [comments, setComments] = useState<TComment[]>(initialState);
   const [isActive, setIsActive] = useState<boolean>(false);
-  const [comment, setComment] = useState<string>('');
+
+  const commentData = useAppSelector(
+    (state) => state.commentsReducer.commentData
+  );
+
   const [unicID, setInicID] = useState<number>(4);
   const [isActiveMenu, setIsActiveMenu] = useState<number | undefined>();
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(
@@ -65,13 +80,15 @@ const Comments: React.FC<TCommentsProps> = ({
     isDarkTheme ? 'dark' : 'light'
   );
 
+  const [editComments, setEditComments] = useState<TComment[]>([]);
+
   const emptyComment: string = '';
 
   const emptyObj = {
     id: unicID,
     name: 'Ваня',
     lastName: 'Пашкин',
-    data: comment,
+    data: commentData,
     likes: [],
     dislikes: [],
   };
@@ -82,22 +99,20 @@ const Comments: React.FC<TCommentsProps> = ({
 
   const handleChangeComment = useCallback(
     (еvent: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setComment(еvent.target.value);
+      dispatch(changeCommentData(еvent.target.value));
     },
     []
   );
 
   const handleCancel = useCallback(() => {
-    setComment(emptyComment);
+    // setCommentData(emptyComment);
     setIsActive(false);
   }, []);
 
   const handleAddComment = useCallback(() => {
-    setComments([...comments, emptyObj]);
-    setComment(emptyComment);
+    dispatch(addCommentThunk());
     setIsActive(false);
-    setInicID(unicID + 1);
-  }, [comments, emptyObj, unicID]);
+  }, []);
 
   const reactionToggle = useCallback(
     (likes: number[]) => {
@@ -162,12 +177,47 @@ const Comments: React.FC<TCommentsProps> = ({
     window.localStorage.setItem('isDarkTheme', newTheme ? 'dark' : 'light');
   }, [isDarkTheme]);
 
-  const handleDeleteComment = useCallback(
-    (id: number) => {
-      setComments(comments.filter((comment) => comment.id !== id));
-    },
-    [comments]
-  );
+  const handleDeleteComment = useCallback((id: number) => {
+    dispatch(deleteComment(id));
+  }, []);
+
+  const handleToggleEditComment = (id: number) => {
+    const newComment = comments.find((comment) => comment.id === id);
+    if (newComment == undefined) return;
+    setEditComments([...editComments, newComment]);
+  };
+
+  const handleEditCommentData = (
+    id: number,
+    еvent: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setEditComments(
+      editComments.map((editComment) =>
+        editComment.id === id
+          ? { ...editComment, data: еvent.target.value }
+          : editComment
+      )
+    );
+  };
+
+  const handleCancelEdit = (id: number) => {
+    setEditComments(
+      editComments.filter((editComment) => editComment.id !== id)
+    );
+  };
+
+  const handleSaveEdit = (id: number) => {
+    setComments(
+      comments.map((comment) => {
+        const editComment = editComments.find(
+          (editComment) => editComment.id === comment.id
+        );
+        if (comment.id === id && editComment) return editComment;
+        return comment;
+      })
+    );
+    handleCancelEdit(id);
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -187,26 +237,48 @@ const Comments: React.FC<TCommentsProps> = ({
         handleIsActive={handleIsActive}
         handleChangeComment={handleChangeComment}
         handleCancel={handleCancel}
-        comment={comment}
+        comment={commentData}
         handleAddComment={handleAddComment}
       />
       <ul>
-        {comments.map((comment) => (
-          <Comment
-            isActiveMenu={isActiveMenu === comment.id}
-            id={comment.id}
-            name={comment.name}
-            lastName={comment.lastName}
-            data={comment.data}
-            key={comment.id}
-            likes={comment.likes}
-            dislikes={comment.dislikes}
-            handleLike={() => handleLike(comment.id)}
-            handleDislike={() => handleDislike(comment.id)}
-            handleMenuButton={() => handleMenuButton(comment.id)}
-            handleDeleteComment={() => handleDeleteComment(comment.id)}
-          />
-        ))}
+        {comments2.map((comment) => {
+          const editComment = editComments.find(
+            (eComment) => eComment.id === comment.id
+          );
+          return editComment ? (
+            <CreateComment
+              isActive
+              handleChangeComment={(event) => {
+                handleEditCommentData(comment.id, event);
+              }}
+              handleCancel={() => {
+                handleCancelEdit(editComment.id);
+              }}
+              comment={editComment.data}
+              handleAddComment={() => {
+                handleSaveEdit(comment.id);
+              }}
+              isEdit={true}
+            />
+          ) : (
+            <Comment
+              isActiveMenu={isActiveMenu === comment.id}
+              id={comment.id}
+              name={comment.name}
+              lastName={comment.lastName}
+              data={comment.data}
+              key={comment.id}
+              likes={comment.likes}
+              dislikes={comment.dislikes}
+              handleLike={() => handleLike(comment.id)}
+              handleDislike={() => handleDislike(comment.id)}
+              handleMenuButton={() => handleMenuButton(comment.id)}
+              handleDeleteComment={() => handleDeleteComment(comment.id)}
+              handleEditComment={() => handleToggleEditComment(comment.id)}
+              userId={userId}
+            />
+          );
+        })}
       </ul>
     </div>
   );

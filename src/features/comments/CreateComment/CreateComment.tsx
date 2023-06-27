@@ -5,13 +5,14 @@ import Circle from '../../../components/Circle/Circle';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 type TCreateCommentProps = {
-  handleIsActive: () => void;
+  handleIsActive?: () => void;
   isActive: boolean;
   handleChangeComment: (е: React.ChangeEvent<HTMLTextAreaElement>) => void;
   comment: string;
   handleCancel: () => void;
   handleAddComment: () => void;
   intl: any;
+  isEdit?: boolean;
 };
 
 const CreateComment: React.FC<TCreateCommentProps> = ({
@@ -22,6 +23,7 @@ const CreateComment: React.FC<TCreateCommentProps> = ({
   handleCancel,
   handleAddComment,
   intl,
+  isEdit = false,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -59,7 +61,11 @@ const CreateComment: React.FC<TCreateCommentProps> = ({
             })}
             onClick={handleAddComment}
           >
-            <FormattedMessage id="add_comment" />
+            {isEdit ? (
+              <FormattedMessage id="save" />
+            ) : (
+              <FormattedMessage id="add_comment" />
+            )}
           </button>
         </div>
       </div>
