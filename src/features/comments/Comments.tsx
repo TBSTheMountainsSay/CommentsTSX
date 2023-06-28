@@ -1,19 +1,22 @@
 import React, { useCallback, useState } from 'react';
 import styles from './Comments.module.scss';
 import CreateComment from './CreateComment/CreateComment';
-import Comment from '../../components/Comment/Comment';
-import { TComment } from './Comments.types';
-import { useThemeDetector } from '../../hooks/useThemeDetector';
-import { useBubbles } from '../../hooks/useBubble';
-import LanguagesSwitcher from '../../components/Buttons/LanguageSwitcher/LanguagesSwitcher';
-import ThemeSwitcher from '../../components/Buttons/ThemeSwitcher/ThemeSwitcher';
-import { TLanguage } from '../../app.slice';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import Comment from 'src/components/Comment/Comment';
+import { useThemeDetector } from 'src/hooks/useThemeDetector';
+import LanguagesSwitcher from 'src/components/Buttons/LanguageSwitcher/LanguagesSwitcher';
+import ThemeSwitcher from 'src/components/Buttons/ThemeSwitcher/ThemeSwitcher';
+import { TLanguage } from 'src/app.slice';
+import { useAppDispatch, useAppSelector } from 'src/app/hooks';
 import {
-  addComment,
   addCommentThunk,
+  cancelEdit,
   changeCommentData,
   deleteComment,
+  dislikeThunk,
+  editCommentData,
+  likeThunk,
+  saveCommentThunk,
+  ToggleEditComment,
 } from './comments.slice';
 
 type TCommentsProps = {
@@ -28,49 +31,18 @@ const Comments: React.FC<TCommentsProps> = ({
   const dispatch = useAppDispatch();
 
   const userId = useAppSelector((state) => state.app.userId);
-
   const comments2 = useAppSelector((state) => state.commentsReducer.comments);
-
-  const initialState = [
-    {
-      id: 1,
-      name: 'Паша',
-      lastName: 'Ванин',
-      data: 'Значит так: value, то бишь  каждый символ в textarea, мы берем из BLL, в стейте. Делаем мы это через props. Чтобы добавить каждый символ в стейт, т.е. наше value, мы используем обработчик onChange. Программируем наш onChange, чтобы value (символ который мы  нажали) передавался в стейт. Делаем это через функцию update, которая должна лежать со стейтом в BLL. Прокидываем эту функцию через props в нашу компоненту. В обработчике пишем,  вызови update(со значением value(символ)). т. е. то, что мы ввели, через функцию записывается в какой-то массив в стейте. А textarea говорит: О! Сейчас кто-то ввел символ и  мой value стал тем, что ввели. Быстренько отображаю это, в поле ввода. Получается, сначала поменялся state в BLL, а потом Ui в textarea. Это концепция Flux архитектуры.',
-      likes: [0, 1, 3],
-      dislikes: [2],
-    },
-    {
-      id: 2,
-      name: 'Никита',
-      lastName: 'Широбоков',
-      data: 'ПРОВЕРКА 1',
-      likes: [1, 2],
-      dislikes: [0, 3],
-    },
-    {
-      id: 3,
-      name: 'Андрей',
-      lastName: 'Парыгин',
-      data: 'ПРОВЕРКА 2',
-      likes: [2, 3],
-      dislikes: [1],
-    },
-  ];
-
-  const { bubblesElement, startAnimation } = useBubbles();
-  const systemTheme = useThemeDetector();
-  const localStorageTheme = window.localStorage.getItem('isDarkTheme');
-  const initialTheme = localStorageTheme || systemTheme;
-
-  const [comments, setComments] = useState<TComment[]>(initialState);
-  const [isActive, setIsActive] = useState<boolean>(false);
-
+  const editComments = useAppSelector(
+    (state) => state.commentsReducer.editComments
+  );
   const commentData = useAppSelector(
     (state) => state.commentsReducer.commentData
   );
 
-  const [unicID, setInicID] = useState<number>(4);
+  const systemTheme = useThemeDetector();
+  const localStorageTheme = window.localStorage.getItem('isDarkTheme');
+  const initialTheme = localStorageTheme || systemTheme;
+  const [isActive, setIsActive] = useState<boolean>(false);
   const [isActiveMenu, setIsActiveMenu] = useState<number | undefined>();
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(
     initialTheme === 'dark'
@@ -79,19 +51,6 @@ const Comments: React.FC<TCommentsProps> = ({
     'color-scheme',
     isDarkTheme ? 'dark' : 'light'
   );
-
-  const [editComments, setEditComments] = useState<TComment[]>([]);
-
-  const emptyComment: string = '';
-
-  const emptyObj = {
-    id: unicID,
-    name: 'Ваня',
-    lastName: 'Пашкин',
-    data: commentData,
-    likes: [],
-    dislikes: [],
-  };
 
   const handleIsActive = useCallback(() => {
     setIsActive(true);
@@ -105,7 +64,7 @@ const Comments: React.FC<TCommentsProps> = ({
   );
 
   const handleCancel = useCallback(() => {
-    // setCommentData(emptyComment);
+    dispatch(changeCommentData(''));
     setIsActive(false);
   }, []);
 
@@ -114,54 +73,13 @@ const Comments: React.FC<TCommentsProps> = ({
     setIsActive(false);
   }, []);
 
-  const reactionToggle = useCallback(
-    (likes: number[]) => {
-      if (likes.includes(userId)) {
-        return likes.filter((id) => userId !== id);
-      } else {
-        return [...likes, userId];
-      }
-    },
-    [userId]
-  );
+  const handleLike = useCallback((id: number) => {
+    dispatch(likeThunk(id));
+  }, []);
 
-  const handleLike = useCallback(
-    (id: number) => {
-      setComments(
-        comments.map((comment) =>
-          comment.id === id
-            ? {
-                ...comment,
-                likes: reactionToggle(comment.likes),
-                dislikes: comment.dislikes.includes(userId)
-                  ? reactionToggle(comment.dislikes)
-                  : comment.dislikes,
-              }
-            : comment
-        )
-      );
-    },
-    [comments, reactionToggle]
-  );
-
-  const handleDislike = useCallback(
-    (id: number) => {
-      setComments(
-        comments.map((comment) =>
-          comment.id === id
-            ? {
-                ...comment,
-                dislikes: reactionToggle(comment.dislikes),
-                likes: comment.likes.includes(userId)
-                  ? reactionToggle(comment.likes)
-                  : comment.likes,
-              }
-            : comment
-        )
-      );
-    },
-    [comments, reactionToggle]
-  );
+  const handleDislike = useCallback((id: number) => {
+    dispatch(dislikeThunk(id));
+  }, []);
 
   const handleMenuButton = useCallback(
     (id: number) => {
@@ -171,7 +89,6 @@ const Comments: React.FC<TCommentsProps> = ({
   );
 
   const handleChangeTheme = useCallback(() => {
-    startAnimation();
     const newTheme = !isDarkTheme;
     setIsDarkTheme(newTheme);
     window.localStorage.setItem('isDarkTheme', newTheme ? 'dark' : 'light');
@@ -181,43 +98,24 @@ const Comments: React.FC<TCommentsProps> = ({
     dispatch(deleteComment(id));
   }, []);
 
-  const handleToggleEditComment = (id: number) => {
-    const newComment = comments.find((comment) => comment.id === id);
-    if (newComment == undefined) return;
-    setEditComments([...editComments, newComment]);
-  };
+  const handleToggleEditComment = useCallback((id: number) => {
+    dispatch(ToggleEditComment(id));
+  }, []);
 
-  const handleEditCommentData = (
-    id: number,
-    еvent: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    setEditComments(
-      editComments.map((editComment) =>
-        editComment.id === id
-          ? { ...editComment, data: еvent.target.value }
-          : editComment
-      )
-    );
-  };
+  const handleEditCommentData = useCallback(
+    (id: number, еvent: React.ChangeEvent<HTMLTextAreaElement>) => {
+      dispatch(editCommentData({ id, commentData: еvent.target.value }));
+    },
+    []
+  );
 
-  const handleCancelEdit = (id: number) => {
-    setEditComments(
-      editComments.filter((editComment) => editComment.id !== id)
-    );
-  };
+  const handleCancelEdit = useCallback((id: number) => {
+    dispatch(cancelEdit(id));
+  }, []);
 
-  const handleSaveEdit = (id: number) => {
-    setComments(
-      comments.map((comment) => {
-        const editComment = editComments.find(
-          (editComment) => editComment.id === comment.id
-        );
-        if (comment.id === id && editComment) return editComment;
-        return comment;
-      })
-    );
-    handleCancelEdit(id);
-  };
+  const handleSaveEdit = useCallback((id: number) => {
+    dispatch(saveCommentThunk(id));
+  }, []);
 
   return (
     <div className={styles.wrapper}>

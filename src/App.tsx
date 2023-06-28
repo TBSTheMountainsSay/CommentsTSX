@@ -13,10 +13,7 @@ function App() {
   const dispatch = useAppDispatch();
   const language = useAppSelector((state) => state.app.language);
 
-  // const [language, setLanguage] = useState<TLanguage>('ru');
-
   const handleChangeLanguage = useCallback(() => {
-    // setLanguage(language === 'ru' ? 'en' : 'ru');
     dispatch(changeLanguage());
   }, []);
 

@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TComment } from './Comments.types';
-import { AppThunk } from '../../app/store';
-import { incrementByAmount, selectCount } from '../counter/counterSlice';
+import { AppThunk } from 'src/app/store';
+import { reactionToggle } from 'src/helpers/helpers';
 
 export interface CommentsState {
   comments: TComment[];
   commentData: string;
+  editComments: TComment[];
 }
 
 const initialState: CommentsState = {
@@ -36,6 +37,7 @@ const initialState: CommentsState = {
     },
   ],
   commentData: '',
+  editComments: [],
 };
 
 export const commentsSlice = createSlice({
@@ -63,15 +65,100 @@ export const commentsSlice = createSlice({
       };
       state.comments.push(emptyObj);
     },
+    ToggleEditComment: (state, action: PayloadAction<number>) => {
+      const newComment = state.comments.find(
+        (comment) => comment.id === action.payload
+      );
+      if (newComment == undefined) return;
+      state.editComments.push(newComment);
+    },
+    editCommentData: (
+      state,
+      action: PayloadAction<{ id: number; commentData: string }>
+    ) => {
+      state.editComments = state.editComments.map((editComment) =>
+        editComment.id === action.payload.id
+          ? { ...editComment, data: action.payload.commentData }
+          : editComment
+      );
+    },
+    cancelEdit: (state, action: PayloadAction<number>) => {
+      state.editComments = state.editComments.filter(
+        (editComment) => editComment.id !== action.payload
+      );
+    },
+    saveEdit: (state, action: PayloadAction<number>) => {
+      state.comments = state.comments.map((comment) => {
+        const editComment = state.editComments.find(
+          (editComment) => editComment.id === comment.id
+        );
+        if (comment.id === action.payload && editComment) return editComment;
+        return comment;
+      });
+    },
+    like: (state, action: PayloadAction<{ id: number; userId: number }>) => {
+      state.comments = state.comments.map((comment) =>
+        comment.id === action.payload.id
+          ? {
+              ...comment,
+              likes: reactionToggle(comment.likes, action.payload.userId),
+              dislikes: comment.dislikes.includes(action.payload.userId)
+                ? reactionToggle(comment.dislikes, action.payload.userId)
+                : comment.dislikes,
+            }
+          : comment
+      );
+    },
+    dislike: (state, action: PayloadAction<{ id: number; userId: number }>) => {
+      state.comments = state.comments.map((comment) =>
+        comment.id === action.payload.id
+          ? {
+              ...comment,
+              dislikes: reactionToggle(comment.dislikes, action.payload.userId),
+              likes: comment.likes.includes(action.payload.userId)
+                ? reactionToggle(comment.likes, action.payload.userId)
+                : comment.likes,
+            }
+          : comment
+      );
+    },
   },
 });
 
-export const { deleteComment, changeCommentData, addComment } =
-  commentsSlice.actions;
+export const {
+  deleteComment,
+  changeCommentData,
+  ToggleEditComment,
+  editCommentData,
+  cancelEdit,
+} = commentsSlice.actions;
+
+const { addComment, saveEdit, like, dislike } = commentsSlice.actions;
 
 export const addCommentThunk = (): AppThunk => (dispatch, getState) => {
   dispatch(addComment());
   dispatch(changeCommentData(''));
 };
+
+export const saveCommentThunk =
+  (id: number): AppThunk =>
+  (dispatch, getState) => {
+    dispatch(saveEdit(id));
+    dispatch(cancelEdit(id));
+  };
+
+export const likeThunk =
+  (id: number): AppThunk =>
+  (dispatch, getState) => {
+    const userId = getState().app.userId;
+    dispatch(like({ id, userId }));
+  };
+
+export const dislikeThunk =
+  (id: number): AppThunk =>
+  (dispatch, getState) => {
+    const userId = getState().app.userId;
+    dispatch(dislike({ id, userId }));
+  };
 
 export default commentsSlice.reducer;
