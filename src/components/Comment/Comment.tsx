@@ -8,6 +8,8 @@ import { useBubbles } from '../../hooks/useBubble';
 import clsx from 'clsx';
 import ModalMenu from '../ModalMenu/ModalMenu';
 import useClickAway from '../../hooks/useClickAway';
+import { FormattedMessage, injectIntl } from 'react-intl';
+import { timeFrom } from '../../helpers/helpers';
 
 interface TCommentProps extends TComment {
   handleLike: () => void;
@@ -17,6 +19,7 @@ interface TCommentProps extends TComment {
   handleDeleteComment: () => void;
   handleEditComment: () => void;
   userId: number;
+  intl: any;
 }
 
 const Comment: React.FC<TCommentProps> = ({
@@ -26,6 +29,8 @@ const Comment: React.FC<TCommentProps> = ({
   data,
   likes,
   dislikes,
+  date,
+  edited,
   handleLike,
   handleDislike,
   handleMenuButton,
@@ -33,6 +38,7 @@ const Comment: React.FC<TCommentProps> = ({
   handleDeleteComment,
   handleEditComment,
   userId,
+  intl,
 }) => {
   const { bubblesElement, startAnimation } = useBubbles();
   const refElement = useClickAway(() => {
@@ -47,7 +53,10 @@ const Comment: React.FC<TCommentProps> = ({
         <div className={styles.author}>
           <div className={styles.name}>{name}</div>
           <div className={styles.lastName}>{lastName}</div>
-          <div className={styles.time}>25 минут назад</div>
+          <div className={styles.time}>
+            {timeFrom(date)}{' '}
+            {edited && `(${intl.formatMessage({ id: 'edited' })})`}
+          </div>
         </div>
         {data}
         <div className={styles.activity}>
@@ -94,4 +103,4 @@ const Comment: React.FC<TCommentProps> = ({
   );
 };
 
-export default Comment;
+export default injectIntl(Comment);

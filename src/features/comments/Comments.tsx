@@ -18,15 +18,19 @@ import {
   saveCommentThunk,
   ToggleEditComment,
 } from './comments.slice';
+import moment from 'moment';
+import { injectIntl } from 'react-intl';
 
 type TCommentsProps = {
   language: TLanguage;
   handleChangeLanguage: () => void;
+  intl: any;
 };
 
 const Comments: React.FC<TCommentsProps> = ({
   handleChangeLanguage,
   language,
+  intl,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -117,6 +121,27 @@ const Comments: React.FC<TCommentsProps> = ({
     dispatch(saveCommentThunk(id));
   }, []);
 
+  moment.updateLocale(language, {
+    relativeTime: {
+      future: intl.formatMessage({ id: 'time.future' }),
+      past: intl.formatMessage({ id: 'time.past' }),
+      s: intl.formatMessage({ id: 'time.s' }),
+      ss: intl.formatMessage({ id: 'time.ss' }),
+      m: intl.formatMessage({ id: 'time.m' }),
+      mm: intl.formatMessage({ id: 'time.mm' }),
+      h: intl.formatMessage({ id: 'time.h' }),
+      hh: intl.formatMessage({ id: 'time.hh' }),
+      d: intl.formatMessage({ id: 'time.d' }),
+      dd: intl.formatMessage({ id: 'time.dd' }),
+      w: intl.formatMessage({ id: 'time.w' }),
+      ww: intl.formatMessage({ id: 'time.ww' }),
+      M: intl.formatMessage({ id: 'time.M' }),
+      MM: intl.formatMessage({ id: 'time.MM' }),
+      y: intl.formatMessage({ id: 'time.y' }),
+      yy: intl.formatMessage({ id: 'time.yy' }),
+    },
+  });
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.buttons}>
@@ -168,6 +193,8 @@ const Comments: React.FC<TCommentsProps> = ({
               key={comment.id}
               likes={comment.likes}
               dislikes={comment.dislikes}
+              date={comment.date}
+              edited={comment.edited}
               handleLike={() => handleLike(comment.id)}
               handleDislike={() => handleDislike(comment.id)}
               handleMenuButton={() => handleMenuButton(comment.id)}
@@ -182,4 +209,4 @@ const Comments: React.FC<TCommentsProps> = ({
   );
 };
 
-export default Comments;
+export default injectIntl(Comments);

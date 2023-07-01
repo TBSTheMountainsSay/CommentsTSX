@@ -18,6 +18,8 @@ const initialState: CommentsState = {
       data: 'Значит так: value, то бишь  каждый символ в textarea, мы берем из BLL, в стейте. Делаем мы это через props. Чтобы добавить каждый символ в стейт, т.е. наше value, мы используем обработчик onChange. Программируем наш onChange, чтобы value (символ который мы  нажали) передавался в стейт. Делаем это через функцию update, которая должна лежать со стейтом в BLL. Прокидываем эту функцию через props в нашу компоненту. В обработчике пишем,  вызови update(со значением value(символ)). т. е. то, что мы ввели, через функцию записывается в какой-то массив в стейте. А textarea говорит: О! Сейчас кто-то ввел символ и  мой value стал тем, что ввели. Быстренько отображаю это, в поле ввода. Получается, сначала поменялся state в BLL, а потом Ui в textarea. Это концепция Flux архитектуры.',
       likes: [0, 1, 3],
       dislikes: [2],
+      date: new Date(2020, 5, 20),
+      edited: false,
     },
     {
       id: 2,
@@ -26,6 +28,8 @@ const initialState: CommentsState = {
       data: 'ПРОВЕРКА 1',
       likes: [1, 2],
       dislikes: [0, 3],
+      date: new Date(2023, 6, 1),
+      edited: false,
     },
     {
       id: 3,
@@ -34,6 +38,8 @@ const initialState: CommentsState = {
       data: 'ПРОВЕРКА 2',
       likes: [2, 3],
       dislikes: [1],
+      date: new Date(2023, 5, 30),
+      edited: false,
     },
   ],
   commentData: '',
@@ -62,6 +68,8 @@ export const commentsSlice = createSlice({
         data: state.commentData,
         likes: [],
         dislikes: [],
+        date: new Date(),
+        edited: false,
       };
       state.comments.push(emptyObj);
     },
@@ -92,8 +100,9 @@ export const commentsSlice = createSlice({
         const editComment = state.editComments.find(
           (editComment) => editComment.id === comment.id
         );
-        if (comment.id === action.payload && editComment) return editComment;
-        return comment;
+        if (!editComment || comment.id !== action.payload) return comment;
+        editComment.edited = true;
+        return editComment;
       });
     },
     like: (state, action: PayloadAction<{ id: number; userId: number }>) => {
