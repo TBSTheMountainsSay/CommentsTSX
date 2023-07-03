@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './Comments.module.scss';
 import CreateComment from './CreateComment/CreateComment';
 import Comment from 'src/components/Comment/Comment';
@@ -11,9 +11,10 @@ import {
   addCommentThunk,
   cancelEdit,
   changeCommentData,
-  deleteComment,
+  deleteCommentThunk,
   dislikeThunk,
   editCommentData,
+  getCommentsThunk,
   likeThunk,
   saveCommentThunk,
   ToggleEditComment,
@@ -99,7 +100,7 @@ const Comments: React.FC<TCommentsProps> = ({
   }, [isDarkTheme]);
 
   const handleDeleteComment = useCallback((id: number) => {
-    dispatch(deleteComment(id));
+    dispatch(deleteCommentThunk(id));
   }, []);
 
   const handleToggleEditComment = useCallback((id: number) => {
@@ -141,6 +142,10 @@ const Comments: React.FC<TCommentsProps> = ({
       yy: intl.formatMessage({ id: 'time.yy' }),
     },
   });
+
+  useEffect(() => {
+    dispatch(getCommentsThunk());
+  }, []);
 
   return (
     <div className={styles.wrapper}>

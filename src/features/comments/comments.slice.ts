@@ -1,7 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TComment } from './Comments.types';
 import { AppThunk } from 'src/app/store';
 import { reactionToggle } from 'src/helpers/helpers';
+import { commentsAPI } from '../../api/commentsAPI/commentsAPI';
 
 export interface CommentsState {
   comments: TComment[];
@@ -10,38 +11,7 @@ export interface CommentsState {
 }
 
 const initialState: CommentsState = {
-  comments: [
-    {
-      id: 1,
-      name: 'Паша',
-      lastName: 'Ванин',
-      data: 'Значит так: value, то бишь  каждый символ в textarea, мы берем из BLL, в стейте. Делаем мы это через props. Чтобы добавить каждый символ в стейт, т.е. наше value, мы используем обработчик onChange. Программируем наш onChange, чтобы value (символ который мы  нажали) передавался в стейт. Делаем это через функцию update, которая должна лежать со стейтом в BLL. Прокидываем эту функцию через props в нашу компоненту. В обработчике пишем,  вызови update(со значением value(символ)). т. е. то, что мы ввели, через функцию записывается в какой-то массив в стейте. А textarea говорит: О! Сейчас кто-то ввел символ и  мой value стал тем, что ввели. Быстренько отображаю это, в поле ввода. Получается, сначала поменялся state в BLL, а потом Ui в textarea. Это концепция Flux архитектуры.',
-      likes: [0, 1, 3],
-      dislikes: [2],
-      date: new Date(2020, 5, 20),
-      edited: false,
-    },
-    {
-      id: 2,
-      name: 'Никита',
-      lastName: 'Широбоков',
-      data: 'ПРОВЕРКА 1',
-      likes: [1, 2],
-      dislikes: [0, 3],
-      date: new Date(2023, 6, 1),
-      edited: false,
-    },
-    {
-      id: 3,
-      name: 'Андрей',
-      lastName: 'Парыгин',
-      data: 'ПРОВЕРКА 2',
-      likes: [2, 3],
-      dislikes: [1],
-      date: new Date(2023, 5, 30),
-      edited: false,
-    },
-  ],
+  comments: [],
   commentData: '',
   editComments: [],
 };
@@ -50,11 +20,6 @@ export const commentsSlice = createSlice({
   name: 'commentsReducer',
   initialState,
   reducers: {
-    deleteComment: (state, action: PayloadAction<number>) => {
-      state.comments = state.comments.filter(
-        (comment) => comment.id !== action.payload
-      );
-    },
     changeCommentData: (state, action: PayloadAction<string>) => {
       state.commentData = action.payload;
     },
@@ -132,10 +97,21 @@ export const commentsSlice = createSlice({
       );
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(getCommentsThunk.fulfilled, (state, action) => {
+      if (!action.payload) return;
+      state.comments = action.payload;
+    });
+
+    builder.addCase(deleteCommentThunk.fulfilled, (state, action) => {
+      state.comments = state.comments.filter(
+        (comment) => comment.id !== action.payload
+      );
+    });
+  },
 });
 
 export const {
-  deleteComment,
   changeCommentData,
   ToggleEditComment,
   editCommentData,
@@ -169,5 +145,29 @@ export const dislikeThunk =
     const userId = getState().app.userId;
     dispatch(dislike({ id, userId }));
   };
+
+export const getCommentsThunk = createAsyncThunk(
+  'commentsReducer/getCommentsThunk',
+  async (_, thunkAPI) => {
+    try {
+      const { data } = await commentsAPI.getComments();
+      return data;
+    } catch (e: any) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);
+
+export const deleteCommentThunk = createAsyncThunk(
+  'commentReducer/deleteCommentThunk',
+  async (id: number, thunkAPI) => {
+    try {
+      await commentsAPI.deleteComment(id);
+      return id;
+    } catch (e: any) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);
 
 export default commentsSlice.reducer;
