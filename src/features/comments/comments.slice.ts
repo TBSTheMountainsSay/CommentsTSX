@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TComment } from './Comments.types';
-import { AppThunk } from 'src/app/store';
+import { AppThunk, RootState } from 'src/app/store';
 import { reactionToggle } from 'src/helpers/helpers';
 import { commentsAPI } from '../../api/commentsAPI/commentsAPI';
+import { TAddCommentRequest } from '../../api/commentsAPI/commentsAPI.types';
 
 export interface CommentsState {
   comments: TComment[];
@@ -23,21 +24,7 @@ export const commentsSlice = createSlice({
     changeCommentData: (state, action: PayloadAction<string>) => {
       state.commentData = action.payload;
     },
-    addComment: (state) => {
-      const lastCommentIndex = state.comments.length - 1;
-      const lastComment = state.comments[lastCommentIndex];
-      const emptyObj = {
-        id: lastComment.id + 1,
-        name: 'Ваня',
-        lastName: 'Пашкин',
-        data: state.commentData,
-        likes: [],
-        dislikes: [],
-        date: new Date(),
-        edited: false,
-      };
-      state.comments.push(emptyObj);
-    },
+
     ToggleEditComment: (state, action: PayloadAction<number>) => {
       const newComment = state.comments.find(
         (comment) => comment.id === action.payload
@@ -60,16 +47,7 @@ export const commentsSlice = createSlice({
         (editComment) => editComment.id !== action.payload
       );
     },
-    saveEdit: (state, action: PayloadAction<number>) => {
-      state.comments = state.comments.map((comment) => {
-        const editComment = state.editComments.find(
-          (editComment) => editComment.id === comment.id
-        );
-        if (!editComment || comment.id !== action.payload) return comment;
-        editComment.edited = true;
-        return editComment;
-      });
-    },
+
     like: (state, action: PayloadAction<{ id: number; userId: number }>) => {
       state.comments = state.comments.map((comment) =>
         comment.id === action.payload.id
@@ -108,6 +86,14 @@ export const commentsSlice = createSlice({
         (comment) => comment.id !== action.payload
       );
     });
+    builder.addCase(addCommentThunk.fulfilled, (state, action) => {
+      state.comments.push(action.payload);
+    });
+    builder.addCase(saveEditCommentThunk.fulfilled, (state, action) => {
+      state.comments = state.comments.map((comment) =>
+        comment.id === action.payload.id ? action.payload : comment
+      );
+    });
   },
 });
 
@@ -118,32 +104,52 @@ export const {
   cancelEdit,
 } = commentsSlice.actions;
 
-const { addComment, saveEdit, like, dislike } = commentsSlice.actions;
-
-export const addCommentThunk = (): AppThunk => (dispatch, getState) => {
-  dispatch(addComment());
-  dispatch(changeCommentData(''));
-};
-
-export const saveCommentThunk =
-  (id: number): AppThunk =>
-  (dispatch, getState) => {
-    dispatch(saveEdit(id));
-    dispatch(cancelEdit(id));
-  };
-
 export const likeThunk =
   (id: number): AppThunk =>
   (dispatch, getState) => {
     const userId = getState().app.userId;
-    dispatch(like({ id, userId }));
+    const comment = getState().commentsReducer.comments.find(
+      (comment) => comment.id === id
+    );
+    if (!comment) return;
+    const newComment = {
+      ...comment,
+      likes: reactionToggle(comment.likes, userId),
+      dislikes: comment.dislikes.includes(userId)
+        ? reactionToggle(comment.dislikes, userId)
+        : comment.dislikes,
+    };
+    dispatch(saveEditCommentThunk(newComment));
   };
 
 export const dislikeThunk =
   (id: number): AppThunk =>
   (dispatch, getState) => {
     const userId = getState().app.userId;
-    dispatch(dislike({ id, userId }));
+    const comment = getState().commentsReducer.comments.find(
+      (comment) => comment.id === id
+    );
+    if (!comment) return;
+    const newComment = {
+      ...comment,
+      dislikes: reactionToggle(comment.dislikes, userId),
+      likes: comment.likes.includes(userId)
+        ? reactionToggle(comment.likes, userId)
+        : comment.likes,
+    };
+    dispatch(saveEditCommentThunk(newComment));
+  };
+
+export const saveEditThunk =
+  (id: number): AppThunk =>
+  (dispatch, getState) => {
+    const comment = getState().commentsReducer.editComments.find(
+      (editComment) => editComment.id === id
+    );
+    if (!comment) {
+      return;
+    }
+    dispatch(saveEditCommentThunk({ ...comment, edited: true }));
   };
 
 export const getCommentsThunk = createAsyncThunk(
@@ -164,6 +170,44 @@ export const deleteCommentThunk = createAsyncThunk(
     try {
       await commentsAPI.deleteComment(id);
       return id;
+    } catch (e: any) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);
+
+export const addCommentThunk = createAsyncThunk(
+  'commentReducer/addCommentThunk',
+  async (_, thunkAPI) => {
+    const globalState = thunkAPI.getState() as RootState;
+    const comment = {
+      name: 'Ваня',
+      lastName: 'Пашкин',
+      data: globalState.commentsReducer.commentData,
+      likes: [],
+      dislikes: [],
+      date: new Date(),
+      edited: false,
+    };
+    try {
+      const { data } = await commentsAPI.addComment(comment);
+      thunkAPI.dispatch(changeCommentData(''));
+      return data;
+    } catch (e: any) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);
+
+export const saveEditCommentThunk = createAsyncThunk(
+  'commentReducer/saveEditCommentThunk',
+  async (comment: TComment, thunkAPI) => {
+    try {
+      const { data } = await commentsAPI.saveEditComment(comment.id, {
+        ...comment,
+      });
+      thunkAPI.dispatch(cancelEdit(comment.id));
+      return data;
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.message);
     }

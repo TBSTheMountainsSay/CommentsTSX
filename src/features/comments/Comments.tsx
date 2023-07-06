@@ -16,7 +16,8 @@ import {
   editCommentData,
   getCommentsThunk,
   likeThunk,
-  saveCommentThunk,
+  saveEditCommentThunk,
+  saveEditThunk,
   ToggleEditComment,
 } from './comments.slice';
 import moment from 'moment';
@@ -119,7 +120,7 @@ const Comments: React.FC<TCommentsProps> = ({
   }, []);
 
   const handleSaveEdit = useCallback((id: number) => {
-    dispatch(saveCommentThunk(id));
+    dispatch(saveEditThunk(id));
   }, []);
 
   moment.updateLocale(language, {
