@@ -46,6 +46,14 @@
     animation: bubble .5s forwards;
   }
 }
+
+.svg-preloader{
+  stroke: var(--def-black);
+  width: 2.8rem;
+  height: 2.8rem;
+  margin: 0 auto;
+}
+
 @keyframes bubble {
   0%{transform: scale(0); opacity:0}
   50%{opacity:1}
@@ -77,3 +85,5 @@
   }
   color-scheme:dark;
 }
+
+

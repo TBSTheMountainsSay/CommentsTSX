@@ -7,8 +7,16 @@
   padding: 0 10rem;
   align-items: end;
 
+
+
   ul {
     width: 100%;
+
+    .preloader-container{
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
   }
 
   .buttons {

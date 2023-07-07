@@ -16,12 +16,12 @@ import {
   editCommentData,
   getCommentsThunk,
   likeThunk,
-  saveEditCommentThunk,
   saveEditThunk,
   ToggleEditComment,
 } from './comments.slice';
 import moment from 'moment';
 import { injectIntl } from 'react-intl';
+import SvgSelector from '../../components/SvgSelector/SvgSelector';
 
 type TCommentsProps = {
   language: TLanguage;
@@ -37,13 +37,15 @@ const Comments: React.FC<TCommentsProps> = ({
   const dispatch = useAppDispatch();
 
   const userId = useAppSelector((state) => state.app.userId);
-  const comments2 = useAppSelector((state) => state.commentsReducer.comments);
+  const comments = useAppSelector((state) => state.commentsReducer.comments);
   const editComments = useAppSelector(
     (state) => state.commentsReducer.editComments
   );
   const commentData = useAppSelector(
     (state) => state.commentsReducer.commentData
   );
+
+  const meta = useAppSelector((state) => state.commentsReducer.meta);
 
   const systemTheme = useThemeDetector();
   const localStorageTheme = window.localStorage.getItem('isDarkTheme');
@@ -161,35 +163,53 @@ const Comments: React.FC<TCommentsProps> = ({
         />
       </div>
 
-      <CreateComment
-        isActive={isActive}
-        handleIsActive={handleIsActive}
-        handleChangeComment={handleChangeComment}
-        handleCancel={handleCancel}
-        comment={commentData}
-        handleAddComment={handleAddComment}
-      />
+      {meta.creating || meta.fetching ? (
+        <SvgSelector id={'preloader'} className={'svg-preloader'} />
+      ) : (
+        <CreateComment
+          isActive={isActive}
+          handleIsActive={handleIsActive}
+          handleChangeComment={handleChangeComment}
+          handleCancel={handleCancel}
+          comment={commentData}
+          handleAddComment={handleAddComment}
+        />
+      )}
       <ul>
-        {comments2.map((comment) => {
+        {comments.map((comment) => {
           const editComment = editComments.find(
             (eComment) => eComment.id === comment.id
           );
-          return editComment ? (
-            <CreateComment
-              isActive
-              handleChangeComment={(event) => {
-                handleEditCommentData(comment.id, event);
-              }}
-              handleCancel={() => {
-                handleCancelEdit(editComment.id);
-              }}
-              comment={editComment.data}
-              handleAddComment={() => {
-                handleSaveEdit(comment.id);
-              }}
-              isEdit={true}
-            />
-          ) : (
+
+          if (
+            meta.editing.includes(comment.id) ||
+            meta.deleting.includes(comment.id)
+          )
+            return (
+              <div className={styles['preloader-container']}>
+                <SvgSelector id={'preloader'} className={'svg-preloader'} />
+              </div>
+            );
+
+          if (editComment)
+            return (
+              <CreateComment
+                isActive
+                handleChangeComment={(event) => {
+                  handleEditCommentData(comment.id, event);
+                }}
+                handleCancel={() => {
+                  handleCancelEdit(editComment.id);
+                }}
+                comment={editComment.data}
+                handleAddComment={() => {
+                  handleSaveEdit(comment.id);
+                }}
+                isEdit={true}
+              />
+            );
+
+          return (
             <Comment
               isActiveMenu={isActiveMenu === comment.id}
               id={comment.id}

@@ -1,20 +1,31 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TComment } from './Comments.types';
 import { AppThunk, RootState } from 'src/app/store';
-import { reactionToggle } from 'src/helpers/helpers';
+import { toggleArray } from 'src/helpers/helpers';
 import { commentsAPI } from '../../api/commentsAPI/commentsAPI';
-import { TAddCommentRequest } from '../../api/commentsAPI/commentsAPI.types';
 
 export interface CommentsState {
   comments: TComment[];
   commentData: string;
   editComments: TComment[];
+  meta: {
+    fetching: boolean;
+    creating: boolean;
+    editing: number[];
+    deleting: number[];
+  };
 }
 
 const initialState: CommentsState = {
   comments: [],
   commentData: '',
   editComments: [],
+  meta: {
+    fetching: false,
+    creating: false,
+    editing: [],
+    deleting: [],
+  },
 };
 
 export const commentsSlice = createSlice({
@@ -53,9 +64,9 @@ export const commentsSlice = createSlice({
         comment.id === action.payload.id
           ? {
               ...comment,
-              likes: reactionToggle(comment.likes, action.payload.userId),
+              likes: toggleArray(comment.likes, action.payload.userId),
               dislikes: comment.dislikes.includes(action.payload.userId)
-                ? reactionToggle(comment.dislikes, action.payload.userId)
+                ? toggleArray(comment.dislikes, action.payload.userId)
                 : comment.dislikes,
             }
           : comment
@@ -66,32 +77,57 @@ export const commentsSlice = createSlice({
         comment.id === action.payload.id
           ? {
               ...comment,
-              dislikes: reactionToggle(comment.dislikes, action.payload.userId),
+              dislikes: toggleArray(comment.dislikes, action.payload.userId),
               likes: comment.likes.includes(action.payload.userId)
-                ? reactionToggle(comment.likes, action.payload.userId)
+                ? toggleArray(comment.likes, action.payload.userId)
                 : comment.likes,
             }
           : comment
       );
     },
+
+    toggleEditing: (state, action: PayloadAction<number>) => {
+      state.meta.editing = toggleArray(state.meta.editing, action.payload);
+    },
+
+    toggleDeleting: (state, action: PayloadAction<number>) => {
+      state.meta.deleting = toggleArray(state.meta.deleting, action.payload);
+    },
   },
+
   extraReducers: (builder) => {
+    //FETCH
+    builder.addCase(getCommentsThunk.pending, (state) => {
+      state.meta.fetching = true;
+    });
+
     builder.addCase(getCommentsThunk.fulfilled, (state, action) => {
       if (!action.payload) return;
       state.comments = action.payload;
+      state.meta.fetching = false;
     });
 
-    builder.addCase(deleteCommentThunk.fulfilled, (state, action) => {
-      state.comments = state.comments.filter(
-        (comment) => comment.id !== action.payload
-      );
+    //CREATE
+    builder.addCase(addCommentThunk.pending, (state) => {
+      state.meta.creating = true;
     });
+
     builder.addCase(addCommentThunk.fulfilled, (state, action) => {
       state.comments.push(action.payload);
+      state.meta.creating = false;
     });
+
+    //EDIT
     builder.addCase(saveEditCommentThunk.fulfilled, (state, action) => {
       state.comments = state.comments.map((comment) =>
         comment.id === action.payload.id ? action.payload : comment
+      );
+    });
+
+    //DELETE
+    builder.addCase(deleteCommentThunk.fulfilled, (state, action) => {
+      state.comments = state.comments.filter(
+        (comment) => comment.id !== action.payload
       );
     });
   },
@@ -102,6 +138,8 @@ export const {
   ToggleEditComment,
   editCommentData,
   cancelEdit,
+  toggleEditing,
+  toggleDeleting,
 } = commentsSlice.actions;
 
 export const likeThunk =
@@ -114,9 +152,9 @@ export const likeThunk =
     if (!comment) return;
     const newComment = {
       ...comment,
-      likes: reactionToggle(comment.likes, userId),
+      likes: toggleArray(comment.likes, userId),
       dislikes: comment.dislikes.includes(userId)
-        ? reactionToggle(comment.dislikes, userId)
+        ? toggleArray(comment.dislikes, userId)
         : comment.dislikes,
     };
     dispatch(saveEditCommentThunk(newComment));
@@ -132,9 +170,9 @@ export const dislikeThunk =
     if (!comment) return;
     const newComment = {
       ...comment,
-      dislikes: reactionToggle(comment.dislikes, userId),
+      dislikes: toggleArray(comment.dislikes, userId),
       likes: comment.likes.includes(userId)
-        ? reactionToggle(comment.likes, userId)
+        ? toggleArray(comment.likes, userId)
         : comment.likes,
     };
     dispatch(saveEditCommentThunk(newComment));
@@ -149,7 +187,11 @@ export const saveEditThunk =
     if (!comment) {
       return;
     }
-    dispatch(saveEditCommentThunk({ ...comment, edited: true }));
+    dispatch(toggleEditing(id));
+    dispatch(saveEditCommentThunk({ ...comment, edited: true }))
+      .unwrap()
+      .then(() => dispatch(toggleEditing(id)))
+      .catch(() => dispatch(toggleEditing(id)));
   };
 
 export const getCommentsThunk = createAsyncThunk(
@@ -168,9 +210,12 @@ export const deleteCommentThunk = createAsyncThunk(
   'commentReducer/deleteCommentThunk',
   async (id: number, thunkAPI) => {
     try {
+      thunkAPI.dispatch(toggleDeleting(id));
       await commentsAPI.deleteComment(id);
+      thunkAPI.dispatch(toggleDeleting(id));
       return id;
     } catch (e: any) {
+      thunkAPI.dispatch(toggleDeleting(id));
       return thunkAPI.rejectWithValue(e.message);
     }
   }
