@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/CommentsTSX/static/css/main.f3b960b8.css",
+    "main.js": "/CommentsTSX/static/js/main.76cea6d8.js",
+    "static/js/787.7d21d03f.chunk.js": "/CommentsTSX/static/js/787.7d21d03f.chunk.js",
+    "index.html": "/CommentsTSX/index.html",
+    "main.f3b960b8.css.map": "/CommentsTSX/static/css/main.f3b960b8.css.map",
+    "main.76cea6d8.js.map": "/CommentsTSX/static/js/main.76cea6d8.js.map",
+    "787.7d21d03f.chunk.js.map": "/CommentsTSX/static/js/787.7d21d03f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f3b960b8.css",
+    "static/js/main.76cea6d8.js"
+  ]
+}
