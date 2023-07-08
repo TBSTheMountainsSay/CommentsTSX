@@ -5,4 +5,6 @@ export type TComment = {
   data: string;
   likes: number[];
   dislikes: number[];
+  date: Date;
+  edited: boolean;
 };

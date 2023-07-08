@@ -5,18 +5,16 @@ import 'src/css/color.scss';
 import './App.scss';
 import Comments from './features/comments/Comments';
 import { messages } from './Languages/Languages';
-import { IntlProvider } from 'react-intl';
+import { injectIntl, IntlProvider } from 'react-intl';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { changeLanguage } from './app.slice';
+import moment from 'moment';
 
-function App() {
+const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const language = useAppSelector((state) => state.app.language);
 
-  // const [language, setLanguage] = useState<TLanguage>('ru');
-
   const handleChangeLanguage = useCallback(() => {
-    // setLanguage(language === 'ru' ? 'en' : 'ru');
     dispatch(changeLanguage());
   }, []);
 
@@ -34,6 +32,6 @@ function App() {
       </div>
     </IntlProvider>
   );
-}
+};
 
 export default App;

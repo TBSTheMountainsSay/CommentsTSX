@@ -1,76 +1,56 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './Comments.module.scss';
 import CreateComment from './CreateComment/CreateComment';
-import Comment from '../../components/Comment/Comment';
-import { TComment } from './Comments.types';
-import { useThemeDetector } from '../../hooks/useThemeDetector';
-import { useBubbles } from '../../hooks/useBubble';
-import LanguagesSwitcher from '../../components/Buttons/LanguageSwitcher/LanguagesSwitcher';
-import ThemeSwitcher from '../../components/Buttons/ThemeSwitcher/ThemeSwitcher';
-import { TLanguage } from '../../app.slice';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import Comment from 'src/components/Comment/Comment';
+import { useThemeDetector } from 'src/hooks/useThemeDetector';
+import LanguagesSwitcher from 'src/components/Buttons/LanguageSwitcher/LanguagesSwitcher';
+import ThemeSwitcher from 'src/components/Buttons/ThemeSwitcher/ThemeSwitcher';
+import { TLanguage } from 'src/app.slice';
+import { useAppDispatch, useAppSelector } from 'src/app/hooks';
 import {
-  addComment,
   addCommentThunk,
+  cancelEdit,
   changeCommentData,
-  deleteComment,
+  deleteCommentThunk,
+  dislikeThunk,
+  editCommentData,
+  getCommentsThunk,
+  likeThunk,
+  saveEditThunk,
+  ToggleEditComment,
 } from './comments.slice';
+import moment from 'moment';
+import { injectIntl } from 'react-intl';
+import SvgSelector from '../../components/SvgSelector/SvgSelector';
 
 type TCommentsProps = {
   language: TLanguage;
   handleChangeLanguage: () => void;
+  intl: any;
 };
 
 const Comments: React.FC<TCommentsProps> = ({
   handleChangeLanguage,
   language,
+  intl,
 }) => {
   const dispatch = useAppDispatch();
 
   const userId = useAppSelector((state) => state.app.userId);
-
-  const comments2 = useAppSelector((state) => state.commentsReducer.comments);
-
-  const initialState = [
-    {
-      id: 1,
-      name: 'Паша',
-      lastName: 'Ванин',
-      data: 'Значит так: value, то бишь  каждый символ в textarea, мы берем из BLL, в стейте. Делаем мы это через props. Чтобы добавить каждый символ в стейт, т.е. наше value, мы используем обработчик onChange. Программируем наш onChange, чтобы value (символ который мы  нажали) передавался в стейт. Делаем это через функцию update, которая должна лежать со стейтом в BLL. Прокидываем эту функцию через props в нашу компоненту. В обработчике пишем,  вызови update(со значением value(символ)). т. е. то, что мы ввели, через функцию записывается в какой-то массив в стейте. А textarea говорит: О! Сейчас кто-то ввел символ и  мой value стал тем, что ввели. Быстренько отображаю это, в поле ввода. Получается, сначала поменялся state в BLL, а потом Ui в textarea. Это концепция Flux архитектуры.',
-      likes: [0, 1, 3],
-      dislikes: [2],
-    },
-    {
-      id: 2,
-      name: 'Никита',
-      lastName: 'Широбоков',
-      data: 'ПРОВЕРКА 1',
-      likes: [1, 2],
-      dislikes: [0, 3],
-    },
-    {
-      id: 3,
-      name: 'Андрей',
-      lastName: 'Парыгин',
-      data: 'ПРОВЕРКА 2',
-      likes: [2, 3],
-      dislikes: [1],
-    },
-  ];
-
-  const { bubblesElement, startAnimation } = useBubbles();
-  const systemTheme = useThemeDetector();
-  const localStorageTheme = window.localStorage.getItem('isDarkTheme');
-  const initialTheme = localStorageTheme || systemTheme;
-
-  const [comments, setComments] = useState<TComment[]>(initialState);
-  const [isActive, setIsActive] = useState<boolean>(false);
-
+  const comments = useAppSelector((state) => state.commentsReducer.comments);
+  const editComments = useAppSelector(
+    (state) => state.commentsReducer.editComments
+  );
   const commentData = useAppSelector(
     (state) => state.commentsReducer.commentData
   );
 
-  const [unicID, setInicID] = useState<number>(4);
+  const meta = useAppSelector((state) => state.commentsReducer.meta);
+
+  const systemTheme = useThemeDetector();
+  const localStorageTheme = window.localStorage.getItem('isDarkTheme');
+  const initialTheme = localStorageTheme || systemTheme;
+  const [isActive, setIsActive] = useState<boolean>(false);
   const [isActiveMenu, setIsActiveMenu] = useState<number | undefined>();
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(
     initialTheme === 'dark'
@@ -79,19 +59,6 @@ const Comments: React.FC<TCommentsProps> = ({
     'color-scheme',
     isDarkTheme ? 'dark' : 'light'
   );
-
-  const [editComments, setEditComments] = useState<TComment[]>([]);
-
-  const emptyComment: string = '';
-
-  const emptyObj = {
-    id: unicID,
-    name: 'Ваня',
-    lastName: 'Пашкин',
-    data: commentData,
-    likes: [],
-    dislikes: [],
-  };
 
   const handleIsActive = useCallback(() => {
     setIsActive(true);
@@ -105,7 +72,7 @@ const Comments: React.FC<TCommentsProps> = ({
   );
 
   const handleCancel = useCallback(() => {
-    // setCommentData(emptyComment);
+    dispatch(changeCommentData(''));
     setIsActive(false);
   }, []);
 
@@ -114,54 +81,13 @@ const Comments: React.FC<TCommentsProps> = ({
     setIsActive(false);
   }, []);
 
-  const reactionToggle = useCallback(
-    (likes: number[]) => {
-      if (likes.includes(userId)) {
-        return likes.filter((id) => userId !== id);
-      } else {
-        return [...likes, userId];
-      }
-    },
-    [userId]
-  );
+  const handleLike = useCallback((id: number) => {
+    dispatch(likeThunk(id));
+  }, []);
 
-  const handleLike = useCallback(
-    (id: number) => {
-      setComments(
-        comments.map((comment) =>
-          comment.id === id
-            ? {
-                ...comment,
-                likes: reactionToggle(comment.likes),
-                dislikes: comment.dislikes.includes(userId)
-                  ? reactionToggle(comment.dislikes)
-                  : comment.dislikes,
-              }
-            : comment
-        )
-      );
-    },
-    [comments, reactionToggle]
-  );
-
-  const handleDislike = useCallback(
-    (id: number) => {
-      setComments(
-        comments.map((comment) =>
-          comment.id === id
-            ? {
-                ...comment,
-                dislikes: reactionToggle(comment.dislikes),
-                likes: comment.likes.includes(userId)
-                  ? reactionToggle(comment.likes)
-                  : comment.likes,
-              }
-            : comment
-        )
-      );
-    },
-    [comments, reactionToggle]
-  );
+  const handleDislike = useCallback((id: number) => {
+    dispatch(dislikeThunk(id));
+  }, []);
 
   const handleMenuButton = useCallback(
     (id: number) => {
@@ -171,53 +97,58 @@ const Comments: React.FC<TCommentsProps> = ({
   );
 
   const handleChangeTheme = useCallback(() => {
-    startAnimation();
     const newTheme = !isDarkTheme;
     setIsDarkTheme(newTheme);
     window.localStorage.setItem('isDarkTheme', newTheme ? 'dark' : 'light');
   }, [isDarkTheme]);
 
   const handleDeleteComment = useCallback((id: number) => {
-    dispatch(deleteComment(id));
+    dispatch(deleteCommentThunk(id));
   }, []);
 
-  const handleToggleEditComment = (id: number) => {
-    const newComment = comments.find((comment) => comment.id === id);
-    if (newComment == undefined) return;
-    setEditComments([...editComments, newComment]);
-  };
+  const handleToggleEditComment = useCallback((id: number) => {
+    dispatch(ToggleEditComment(id));
+  }, []);
 
-  const handleEditCommentData = (
-    id: number,
-    еvent: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    setEditComments(
-      editComments.map((editComment) =>
-        editComment.id === id
-          ? { ...editComment, data: еvent.target.value }
-          : editComment
-      )
-    );
-  };
+  const handleEditCommentData = useCallback(
+    (id: number, еvent: React.ChangeEvent<HTMLTextAreaElement>) => {
+      dispatch(editCommentData({ id, commentData: еvent.target.value }));
+    },
+    []
+  );
 
-  const handleCancelEdit = (id: number) => {
-    setEditComments(
-      editComments.filter((editComment) => editComment.id !== id)
-    );
-  };
+  const handleCancelEdit = useCallback((id: number) => {
+    dispatch(cancelEdit(id));
+  }, []);
 
-  const handleSaveEdit = (id: number) => {
-    setComments(
-      comments.map((comment) => {
-        const editComment = editComments.find(
-          (editComment) => editComment.id === comment.id
-        );
-        if (comment.id === id && editComment) return editComment;
-        return comment;
-      })
-    );
-    handleCancelEdit(id);
-  };
+  const handleSaveEdit = useCallback((id: number) => {
+    dispatch(saveEditThunk(id));
+  }, []);
+
+  moment.updateLocale(language, {
+    relativeTime: {
+      future: intl.formatMessage({ id: 'time.future' }),
+      past: intl.formatMessage({ id: 'time.past' }),
+      s: intl.formatMessage({ id: 'time.s' }),
+      ss: intl.formatMessage({ id: 'time.ss' }),
+      m: intl.formatMessage({ id: 'time.m' }),
+      mm: intl.formatMessage({ id: 'time.mm' }),
+      h: intl.formatMessage({ id: 'time.h' }),
+      hh: intl.formatMessage({ id: 'time.hh' }),
+      d: intl.formatMessage({ id: 'time.d' }),
+      dd: intl.formatMessage({ id: 'time.dd' }),
+      w: intl.formatMessage({ id: 'time.w' }),
+      ww: intl.formatMessage({ id: 'time.ww' }),
+      M: intl.formatMessage({ id: 'time.M' }),
+      MM: intl.formatMessage({ id: 'time.MM' }),
+      y: intl.formatMessage({ id: 'time.y' }),
+      yy: intl.formatMessage({ id: 'time.yy' }),
+    },
+  });
+
+  useEffect(() => {
+    dispatch(getCommentsThunk());
+  }, []);
 
   return (
     <div className={styles.wrapper}>
@@ -232,35 +163,53 @@ const Comments: React.FC<TCommentsProps> = ({
         />
       </div>
 
-      <CreateComment
-        isActive={isActive}
-        handleIsActive={handleIsActive}
-        handleChangeComment={handleChangeComment}
-        handleCancel={handleCancel}
-        comment={commentData}
-        handleAddComment={handleAddComment}
-      />
+      {meta.creating || meta.fetching ? (
+        <SvgSelector id={'preloader'} className={'svg-preloader'} />
+      ) : (
+        <CreateComment
+          isActive={isActive}
+          handleIsActive={handleIsActive}
+          handleChangeComment={handleChangeComment}
+          handleCancel={handleCancel}
+          comment={commentData}
+          handleAddComment={handleAddComment}
+        />
+      )}
       <ul>
-        {comments2.map((comment) => {
+        {comments.map((comment) => {
           const editComment = editComments.find(
             (eComment) => eComment.id === comment.id
           );
-          return editComment ? (
-            <CreateComment
-              isActive
-              handleChangeComment={(event) => {
-                handleEditCommentData(comment.id, event);
-              }}
-              handleCancel={() => {
-                handleCancelEdit(editComment.id);
-              }}
-              comment={editComment.data}
-              handleAddComment={() => {
-                handleSaveEdit(comment.id);
-              }}
-              isEdit={true}
-            />
-          ) : (
+
+          if (
+            meta.editing.includes(comment.id) ||
+            meta.deleting.includes(comment.id)
+          )
+            return (
+              <div className={styles['preloader-container']}>
+                <SvgSelector id={'preloader'} className={'svg-preloader'} />
+              </div>
+            );
+
+          if (editComment)
+            return (
+              <CreateComment
+                isActive
+                handleChangeComment={(event) => {
+                  handleEditCommentData(comment.id, event);
+                }}
+                handleCancel={() => {
+                  handleCancelEdit(editComment.id);
+                }}
+                comment={editComment.data}
+                handleAddComment={() => {
+                  handleSaveEdit(comment.id);
+                }}
+                isEdit={true}
+              />
+            );
+
+          return (
             <Comment
               isActiveMenu={isActiveMenu === comment.id}
               id={comment.id}
@@ -270,6 +219,8 @@ const Comments: React.FC<TCommentsProps> = ({
               key={comment.id}
               likes={comment.likes}
               dislikes={comment.dislikes}
+              date={comment.date}
+              edited={comment.edited}
               handleLike={() => handleLike(comment.id)}
               handleDislike={() => handleDislike(comment.id)}
               handleMenuButton={() => handleMenuButton(comment.id)}
@@ -284,4 +235,4 @@ const Comments: React.FC<TCommentsProps> = ({
   );
 };
 
-export default Comments;
+export default injectIntl(Comments);

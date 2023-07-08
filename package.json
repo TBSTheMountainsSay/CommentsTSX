@@ -1,5 +1,6 @@
 {
   "name": "comments",
+  "homepage": "https://tbsthemountainssay.github.io/CommentsTSX",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,7 +12,12 @@
     "@types/node": "^17.0.45",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
+    "axios": "^1.4.0",
     "clsx": "^1.2.1",
+    "concurrently": "^8.2.0",
+    "gh-pages": "^5.0.0",
+    "json-server": "^0.17.3",
+    "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intl": "^6.4.4",
@@ -22,10 +28,14 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "dev": "react-scripts start",
+    "start": "concurrently \"npm run server\" \"npm run dev\"",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "json-server -w server/db.json -p 3001"
   },
   "eslintConfig": {
     "extends": [
