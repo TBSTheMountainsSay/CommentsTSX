@@ -2,7 +2,7 @@ import moment from 'moment';
 
 export const toggleArray = (array: number[], id: number) => {
   if (array.includes(id)) {
-    return array.filter((id) => id !== id);
+    return array.filter((currentId) => currentId !== id);
   } else {
     return [...array, id];
   }

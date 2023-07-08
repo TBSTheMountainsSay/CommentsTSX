@@ -226,8 +226,8 @@ export const addCommentThunk = createAsyncThunk(
   async (_, thunkAPI) => {
     const globalState = thunkAPI.getState() as RootState;
     const comment = {
-      name: 'Ваня',
-      lastName: 'Пашкин',
+      name: 'Геральт',
+      lastName: 'из Ривии',
       data: globalState.commentsReducer.commentData,
       likes: [],
       dislikes: [],
